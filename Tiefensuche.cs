@@ -9,7 +9,8 @@ public class Tiefensuche
     List<Hex> hexaList;
     List<Hex> AlgoList;
     Hex Start, Ende, current;
-
+	
+	// Hauptprogramm
 	public Tiefensuche(Hex start, Hex goal)
 	{
         //hexaList = Grid;
@@ -20,7 +21,8 @@ public class Tiefensuche
         AddNeighborsToList();    //Nachbarn in Warteschlangeliste eintragen
         SearchGrid();            //Suche starten
 	}
-
+	
+	//Suchalgorithmus
     private void SearchGrid()
     {         
         while (Ende.getDiscovered() == false && AlgoList[0]!=null) //Durchlaufen bis das ende entdeckt ist
@@ -31,7 +33,8 @@ public class Tiefensuche
             current.setDiscovered(); //aktuelles Hex als entdeckt makieren
         }
     }
-
+	
+	//Nachbarfunktion
     private void AddNeighborsToList()
     {
         Hex[] Neighbors; //neue Hexarray erstellen
