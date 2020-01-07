@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//Temporär von mir(Paul) erstellte Hexklasse
+
 public class Hex : MonoBehaviour
 {
     Boolean discovered=false;
