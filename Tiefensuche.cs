@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,48 +6,42 @@ using UnityEngine;
 
 public class Tiefensuche
 {
-    List<Hex> hexaList;
     List<Hex> AlgoList;
-    Hex Start, Ende, current;
-	
-	// Hauptprogramm
+    Hex Start, Ende, current; 
+    //Hauptprogramm
 	public Tiefensuche(Hex start, Hex goal)
 	{
-        //hexaList = Grid;
         Start = start;
         Ende = goal;
         current = Start;
-        Start.setDiscovered();   //Erstes Hexagon Makieren
+        Start.SetEntdeckt(true);   //Erstes Hexagon Makieren
         AddNeighborsToList();    //Nachbarn in Warteschlangeliste eintragen
         SearchGrid();            //Suche starten
 	}
-	
-	//Suchalgorithmus
+    //Suchfunktion
     private void SearchGrid()
     {         
-        while (Ende.getDiscovered() == false && AlgoList[0]!=null) //Durchlaufen bis das ende entdeckt ist
+        while (Ende.GetEntdeckt() == false && AlgoList[0]!=null) //Durchlaufen bis das ende entdeckt ist
         {   
             current = AlgoList[0]; //aktuelles Hex aktualisieren
             AlgoList.RemoveAt(0); //erstes Element aus liste holen
             AddNeighborsToList(); // Nachbarn in Liste einfügen
-            current.setDiscovered(); //aktuelles Hex als entdeckt makieren
+            current.SetEntdeckt(true); //aktuelles Hex als entdeckt makieren            
         }
     }
-	
-	//Nachbarfunktion
+    //Nachbarn in Warteschlange anfügen
     private void AddNeighborsToList()
     {
-        Hex[] Neighbors; //neue Hexarray erstellen
-        Neighbors = current.getNeighbors(); //Nachbarn vom aktuellen Hex einholen
+        List<Hex> Neighbors; //neue Hexarray erstellen
+        Neighbors = current.getNachbarn(); //Nachbarn vom aktuellen Hex einholen
 
-        foreach (Hex g in Neighbors) //nachbarn, falls unentdeckt, in liste einfürgen
-            if (!g.getDiscovered())
+        foreach (Hex g in Neighbors) //nachbarn, falls unentdeckt, in liste einfügen
+            if (!g.GetEntdeckt() && g.getBetretbar())
             {
                 AlgoList.Add(g);
                 g.setPrevious(current); // vorheriges Element setzen
-		//HEX-Farbe in wartefarbe ändern
-            }
-        
+                //Hex-Farbe in wartefarbe ändern
+            }        
     }
 }
 
