@@ -1,47 +1,48 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-//Temporär von mir(Paul) erstellte Hexklasse
-
-public class Hex : MonoBehaviour
+public class Hex
 {
-    Boolean discovered=false;
-    Hex previous;
-
-    public Hex[] Neighbors; 
-    
     public int xCoordinate { get; set; }
-    public int yCoordinate { get; set; }    
+    public int yCoordinate { get; set; }
+    public Boolean betretbar { get; set; }
+    public Hex previous { get; set; }
+    public List<Hex> nachbarn;
 
-    public Hex()
+    public int getXCoordinate()
     {
-
+        return xCoordinate;
     }
-
-    public void setDiscovered()
+    public int getYCoordinate()
     {
-        discovered = true;
+        return yCoordinate;
     }
-
-    public Boolean getDiscovered()
+    public List<Hex> getNachbarn()
     {
-        return discovered;
+        return nachbarn;
     }
-
-    public Hex[] getNeighbors()
+    public Boolean getBetretbar()
     {
-        return Neighbors;
-    }    
-
-    public void setPrevious(Hex prev)
-    {
-        previous = prev; 
+        return betretbar;
     }
-
-    public Hex getPrevious(Hex prev)
+    public Hex getPrevious()
     {
         return previous;
     }
+    public void setBetretbar(Boolean betr)
+    {
+        betretbar = betr;
+    }
+    public void setPrevious(Hex prev)
+    {
+        previous = prev;
+    }
+    public void addNachbar(Hex nachb)
+    {
+        nachbarn.Add(nachb);
+    }
 }
+
