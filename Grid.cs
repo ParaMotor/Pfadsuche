@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,21 +20,22 @@ public class Grid : MonoBehaviour
 
     //Liste, in der die Koordinaten der Hexagone gespeichert werden sollen
     List<Hex> HexList = new List<Hex>
-         {
+    {
 
-         };
+    };
 
     //prinzipelle Main Methode
-    void Start()        //Einfügen von int a um die Variablen für Gridgröße zu übergeben und 10 durch a ersetzen 
+    void Start()
     {
-        gridWidth = 10;
-        gridHeight = 10;
 
         CalcStartPos();
         CreateGrid();
+
+        
+        Tiefensuche search = new Tiefensuche(HexList[5], HexList[43]);
         //Das ist nur was zum testen :D
-        //print(HexList[0].xCoordinate + "|" + HexList[0].yCoordinate);
-        //print(HexList.Count);
+        print(HexList[0].xCoordinate + "|" + HexList[0].yCoordinate);
+        print(HexList.Count);
     }
 
     //berechent Startposition
@@ -76,28 +77,37 @@ public class Grid : MonoBehaviour
                 hex.position = CalcWorldPos(gridPos);
                 hex.parent = this.transform;
                 hex.name = "Hexagon" + x + "|" + y;
-                HexList.Add(new Hex() { xCoordinate = x, yCoordinate = y});
+                HexList.Add(new Hex() { xCoordinate = x, yCoordinate = y });
             }
         }
-        int negativex = -1;
-        int positivex = 1;
-        for (int i = 0; i < HexList.Count; i++)
-        {
-            for (int j = 0; j < HexList.Count; j++)
-            {
-                int x_ = HexList[i].xCoordinate - HexList[j].xCoordinate;
-                int y_ = HexList[i].yCoordinate - HexList[j].yCoordinate;
+        int Width = gridWidth - 1;
+        int Height = gridHeight - 1;
 
-                if (negativex <= x_ && x_ <= positivex )
-                {
-                    if (negativex <= y_ && y_ <= positivex)
-                        HexList[i].addNachbar(HexList[j]);
-                }
-            }
+        for (int i=0; i<HexList.Count; i++)
+        {
+            if (HexList[i].xCoordinate < Width)
+                HexList[i].addNachbar(HexList[i + 1]);
+            
+            if (HexList[i].xCoordinate > 0)
+                HexList[i].addNachbar(HexList[i - 1]);
+
+            if (HexList[i].yCoordinate < Height)
+                HexList[i].addNachbar(HexList[i + gridWidth]);
+
+            if (HexList[i].yCoordinate < Height && HexList[i].yCoordinate % 2 == 1 && HexList[i].xCoordinate < Width)
+                HexList[i].addNachbar(HexList[i + gridWidth + 1]);
+
+            if (HexList[i].yCoordinate < Height && HexList[i].yCoordinate % 2 == 0 && HexList[i].xCoordinate > 0)
+                HexList[i].addNachbar(HexList[i + gridWidth - 1]);
+
+            if (HexList[i].yCoordinate > 0)
+                HexList[i].addNachbar(HexList[i - gridWidth]);
+
+            if (HexList[i].yCoordinate > 0 && HexList[i].yCoordinate % 2 == 1 && HexList[i].xCoordinate < Width)
+                HexList[i].addNachbar(HexList[i - gridWidth + 1]);
+
+            if (HexList[i].yCoordinate > 0 && HexList[i].yCoordinate % 2 == 0 && HexList[i].xCoordinate > 0)
+                HexList[i].addNachbar(HexList[i - gridWidth - 1]);
         }
     }
-    
 }
-
-
-
