@@ -7,8 +7,9 @@ public class Grid : MonoBehaviour
 {
     public Transform hexPrefab;
 
-    public int gridWidth = 5;
-    public int gridHeight = 5;
+    //Definition Gridgröße 
+    public int gridWidth;
+    public int gridHeight;
     //public int griddiagonale = 0;             //Da das Hexagonförmige Grid aktuell keine Lust hat, erstmal ein Viereckiges, das wird behoben !!
 
     //Definition des Hexagons (Größe)
@@ -17,24 +18,26 @@ public class Grid : MonoBehaviour
 
     Vector3 startPos;
 
-    //prinzipelle Main Methode
-    void Start()
-    {
-        //Liste, in der die Koordinaten der Hexagone gespeichert werden sollen
-        List<Hex> HexList = new List<Hex>()
-    {
-         new Hex() { xCoordinate = 2, yCoordinate = 3 },
-    };
+    //Liste, in der die Koordinaten der Hexagone gespeichert werden sollen
+    List<Hex> HexList = new List<Hex>
+         {
 
+         };
+
+    //prinzipelle Main Methode
+    void Start(int a, int b)
+    {
+        gridWidth = a;
+        gridHeight = b;
 
         CalcStartPos();
         CreateGrid();
         //Das ist nur was zum testen :D
-        print(HexList[0]);      
+        print(HexList[0].xCoordinate + "|" + HexList[0].yCoordinate);
         print(HexList.Count);
     }
 
-    //berechnet aktuelle Position, um weitere Hexagone einzufügen
+    //berechent Startposition
     void CalcStartPos()
     {
         float offset = 0;
@@ -47,7 +50,7 @@ public class Grid : MonoBehaviour
         startPos = new Vector3(x, 0, z);
     }
 
-
+    //berechnet aktuelle Position, um weitere Hexagone einzufügen
     Vector3 CalcWorldPos(Vector2 gridPos)
     {
         float offset = 0;
@@ -60,21 +63,37 @@ public class Grid : MonoBehaviour
         return new Vector3(x, 0, z);
     }
 
+    //Grid erstellen
     void CreateGrid()
     {
         for (int y = 0; y < gridHeight; y++)
         {
             for (int x = 0; x < gridWidth; x++)
             {
+                //Objekt Hex erstellen, nach Vorlage von HexPrefab
                 Transform hex = Instantiate(hexPrefab) as Transform;
                 Vector2 gridPos = new Vector2(x, y);
                 hex.position = CalcWorldPos(gridPos);
                 hex.parent = this.transform;
                 hex.name = "Hexagon" + x + "|" + y;
-                //HexList.Add(new Hex() { xCoordinate = x, yCoordinate = y });
+                HexList.Add(new Hex() { xCoordinate = x, yCoordinate = y});
+            }
+        }
+        int neg = -1;
+        int pos = +1;
+        for (int i = 0; i < HexList.Count; i++)
+        {
+            for (int j = 0; j < HexList.Count; j++)
+            {
+                if (neg <= (HexList[i].getXCoordinate + HexList[j].getXCoordinate) <= pos)
+                {
+                    if (neg <= (HexList[i].getYCoordinate - HexList[j].getYCoordinate) <= pos)
+                        HexList[i].addNachbar(HexList[j]);
+                }
             }
         }
     }
+    
 }
 
 
