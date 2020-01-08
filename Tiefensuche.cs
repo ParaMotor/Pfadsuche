@@ -45,6 +45,7 @@ public class Tiefensuche
             {
                 AlgoList.Add(g);
                 g.setPrevious(current); // vorheriges Element setzen
+		//HEX-Farbe in wartefarbe ändern
             }
         
     }
