@@ -10,16 +10,9 @@ public class Hex
     public int yCoordinate { get; set; }
     public Boolean betretbar { get; set; }
     public Hex previous { get; set; }
-    public List<Hex> nachbarn;
+    public List<Hex> nachbarn { get; set; }
 
-    public int getXCoordinate()
-    {
-        return xCoordinate;
-    }
-    public int getYCoordinate()
-    {
-        return yCoordinate;
-    }
+
     public List<Hex> getNachbarn()
     {
         return nachbarn;

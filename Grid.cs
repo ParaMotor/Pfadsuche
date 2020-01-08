@@ -79,15 +79,17 @@ public class Grid : MonoBehaviour
                 HexList.Add(new Hex() { xCoordinate = x, yCoordinate = y});
             }
         }
-        int neg = -1;
-        int pos = +1;
+        int negativex = -1;
+        int positivex = 1;
         for (int i = 0; i < HexList.Count; i++)
         {
             for (int j = 0; j < HexList.Count; j++)
             {
-                if (neg <= (HexList[i].getXCoordinate + HexList[j].getXCoordinate) <= pos)
+                int x_ = HexList[i].xCoordinate - HexList[j].xCoordinate;
+                int y_ = HexList[i].yCoordinate - HexList[j].yCoordinate;
+                if (negativex <= x_ && x_ <= positivex )
                 {
-                    if (neg <= (HexList[i].getYCoordinate - HexList[j].getYCoordinate) <= pos)
+                    if (negativex <= y_ && y_ <= positivex)
                         HexList[i].addNachbar(HexList[j]);
                 }
             }
@@ -97,4 +99,4 @@ public class Grid : MonoBehaviour
 }
 
 
-//hallo
+
