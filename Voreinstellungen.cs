@@ -10,7 +10,7 @@ public class Voreinstellungen : MonoBehaviour
     //public GameObject inputField;
     public int groesse;
     //über start(int Wert) das Grid erstellen lassen, Wert ist dabei die Größe, wir wollen ein quadratisches Feld, dafür reicht eine Variable die Methode nur in die von Play einfügen
-    //start(Wert)
+    
     public void BackMainMenu()
     {
         SceneManager.LoadScene(0);
@@ -19,7 +19,7 @@ public class Voreinstellungen : MonoBehaviour
     public void GridGroesse(string eingabe)
     {
         groesse = int.Parse(eingabe);
-        
+        Start(groesse);
     }
 
     // Update is called once per frame
