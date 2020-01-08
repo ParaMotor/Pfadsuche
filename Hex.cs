@@ -33,5 +33,9 @@ public class Hex
     {
         previous = prev;
     }
+    public void addNachbar(Hex nachb)
+    {
+        nachbarn.Add(nachb);
+    }
 }
 

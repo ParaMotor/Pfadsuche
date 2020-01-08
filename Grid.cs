@@ -91,7 +91,7 @@ public class Grid : MonoBehaviour
                 if (negativex <= x_ && x_ <= positivex )
                 {
                     if (negativex <= y_ && y_ <= positivex)
-                        HexList[i].nachbarn.Add(HexList[j]);
+                        HexList[i].addNachbar(HexList[j]);
                 }
             }
         }
