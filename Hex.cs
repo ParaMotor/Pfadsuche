@@ -1,16 +1,14 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UnityEngine;
 
 public class Hex
 {
     public int xCoordinate { get; set; }
     public int yCoordinate { get; set; }
     public Boolean betretbar { get; set; }
-    public Boolean entdeckt { get; set; }
     public Hex previous { get; set; }
     public List<Hex> nachbarn { get; set; }
 
@@ -35,16 +33,5 @@ public class Hex
     {
         previous = prev;
     }
-    public void addNachbar(Hex nachb)
-    {
-        nachbarn.Add(nachb);
-    }
-    public Boolean GetEntdeckt()
-    {
-        return entdeckt;
-    }
-    public void SetEntdeckt(Boolean wert)
-    {
-        entdeckt = wert;
-    }
 }
+

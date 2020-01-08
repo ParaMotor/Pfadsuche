@@ -25,16 +25,16 @@ public class Grid : MonoBehaviour
          };
 
     //prinzipelle Main Methode
-    void Start(int a, int b)
+    void Start()        //Einfügen von int a um die Variablen für Gridgröße zu übergeben und 10 durch a ersetzen 
     {
-        gridWidth = a;
-        gridHeight = b;
+        gridWidth = 10;
+        gridHeight = 10;
 
         CalcStartPos();
         CreateGrid();
         //Das ist nur was zum testen :D
-        print(HexList[0].xCoordinate + "|" + HexList[0].yCoordinate);
-        print(HexList.Count);
+        //print(HexList[0].xCoordinate + "|" + HexList[0].yCoordinate);
+        //print(HexList.Count);
     }
 
     //berechent Startposition
@@ -87,10 +87,11 @@ public class Grid : MonoBehaviour
             {
                 int x_ = HexList[i].xCoordinate - HexList[j].xCoordinate;
                 int y_ = HexList[i].yCoordinate - HexList[j].yCoordinate;
+
                 if (negativex <= x_ && x_ <= positivex )
                 {
                     if (negativex <= y_ && y_ <= positivex)
-                        HexList[i].addNachbar(HexList[j]);
+                        HexList[i].nachbarn.Add(HexList[j]);
                 }
             }
         }
