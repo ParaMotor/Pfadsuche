@@ -1,35 +1,34 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CreatePath : MonoBehaviour
-{
-    Hex Start;
+public class CreatePath {
     Hex Ende;
-    List<Hex> path;
+    public List<Hex> path = new List<Hex>();
     //temporär erstelltes Creatpath-Script
-    public CreatePath(Hex start, Hex goal)
+    public CreatePath(Hex goal)
     {
-        Start = start;
         Ende = goal;
         StartAlgorithm(); //startet Aptherstellung
-        Debug.Log(path);
+        Debug.Log(path.Count);
     }
-
+        
     void StartAlgorithm()
     {
         if (Ende.getPrevious() == null) //Ende nicht erreichbar/ Suchalgorithmus nicht gestartet
             Debug.Log("Ende nicht erreichbar");
         else
         {
-            Hex help = Ende; //Hilfs-Hex
             path.Add(Ende); //Ende in Path einfügen
+            Debug.Log(Ende.xCoordinate + ", " + Ende.yCoordinate);
+            Hex help = Ende.getPrevious(); //Hilfs-Hex
             while (help != null) //Schleife für rechtlichen Hexs
             {
-                path.Add(help.getPrevious()); //Vorgänger wird in Path eingefügt
+                path.Add(help); //Vorgänger wird in Path eingefügt
+                Debug.Log(help.xCoordinate + ", " + help.yCoordinate);
                 //help farbe geben
                 help = help.getPrevious(); //Hilfs-Hex wird neu gesetzt
-            }  
+            } 
         }
     }
 }
