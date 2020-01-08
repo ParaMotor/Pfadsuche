@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,10 +16,20 @@ public class Tiefensuche
 	{
         Start = start;
         Ende = goal;
-        current = Start;    
+        current = Start;
+
+        //Stopuhr starten
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+
+        //Code beginnt
         current.SetEntdeckt(true);   //Erstes Hexagon Makieren
-        AddNeighborsToList();    //Nachbarn in Warteschlangeliste eintragen
-        SearchGrid();            //Suche starten
+        AddNeighborsToList();        //Nachbarn in Warteschlangeliste eintragen
+        SearchGrid();                //Suche starten
+        
+        //Stopuhr anhalten
+        stopwatch.Stop();
+        UnityEngine.Debug.Log(stopwatch.ElapsedMilliseconds +"ms");
         CreatePath path = new CreatePath(goal);
     }
     //Suchfunktion
@@ -26,7 +38,7 @@ public class Tiefensuche
         while (Ende.GetEntdeckt()==false) //Durchlaufen bis das ende entdeckt ist 
         {   
             current = AlgoList[AlgoList.Count-1]; //aktuelles Hex aktualisieren
-            Debug.Log("current Hex: " + current.xCoordinate + ", " + current.yCoordinate);
+            UnityEngine.Debug.Log("current Hex: " + current.xCoordinate + ", " + current.yCoordinate);
             AlgoList.RemoveAt(AlgoList.Count - 1); //erstes Element aus liste holen
             AddNeighborsToList(); // Nachbarn in Liste einfügen 
         }
