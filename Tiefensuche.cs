@@ -1,15 +1,15 @@
-using System;
+﻿using System;
 using System.Diagnostics;
-using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 
-public class Tiefensuche
+public class Tiefensuche : Grid
 {
+    Boolean wait = false;
     List<Hex> AlgoList = new List<Hex>();
-    public Hex Start, Ende;
+    public Hex Start, Ende; 
     Hex current; 
     //Hauptprogramm
 	public Tiefensuche(Hex start, Hex goal)
@@ -36,11 +36,15 @@ public class Tiefensuche
     private void SearchGrid()
     {         
         while (Ende.GetEntdeckt()==false) //Durchlaufen bis das ende entdeckt ist 
-        {   
-            current = AlgoList[AlgoList.Count-1]; //aktuelles Hex aktualisieren
-            UnityEngine.Debug.Log("current Hex: " + current.xCoordinate + ", " + current.yCoordinate);
-            AlgoList.RemoveAt(AlgoList.Count - 1); //erstes Element aus liste holen
-            AddNeighborsToList(); // Nachbarn in Liste einfügen 
+        {
+            if (wait == false)
+            {
+                current = AlgoList[AlgoList.Count - 1]; //aktuelles Hex aktualisieren
+                UnityEngine.Debug.Log("current Hex: " + current.xCoordinate + ", " + current.yCoordinate);
+                AlgoList.RemoveAt(AlgoList.Count - 1); //erstes Element aus liste holen
+                AddNeighborsToList(); // Nachbarn in Liste einfügen 
+                //StartCoroutine(WaitRoutine());
+            }
         }
     }
     //Nachbarn in Warteschlange anfügen
@@ -58,6 +62,13 @@ public class Tiefensuche
                 g.SetEntdeckt(true); //aktuelles Hex als entdeckt makieren  
             }
         }
+    }
+    
+    IEnumerator WaitRoutine()
+    {
+        wait = true;
+        yield return new WaitForSeconds(2.0f);
+        wait = false; 
     }
 }
 

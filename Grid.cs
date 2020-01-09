@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,9 +30,9 @@ public class Grid : MonoBehaviour
 
         CalcStartPos();
         CreateGrid();
-
         
-        Tiefensuche search = new Tiefensuche(HexList[5], HexList[43]);
+        
+        Tiefensuche search = new Tiefensuche(HexList[5], HexList[45]);
         //Das ist nur was zum testen :D
         print(HexList[0].xCoordinate + "|" + HexList[0].yCoordinate);
         print(HexList.Count);
@@ -77,7 +77,9 @@ public class Grid : MonoBehaviour
                 hex.position = CalcWorldPos(gridPos);
                 hex.parent = this.transform;
                 hex.name = "Hexagon" + x + "|" + y;
-                HexList.Add(new Hex() { xCoordinate = x, yCoordinate = y });
+                HexList.Add(hex.GetComponent<Hex>());//new Hex() { xCoordinate = x, yCoordinate = y }
+                hex.GetComponent<Hex>().SetX(x);
+                hex.GetComponent<Hex>().SetY(y);
             }
         }
         int Width = gridWidth - 1;
