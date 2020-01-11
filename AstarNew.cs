@@ -89,7 +89,8 @@ public class Astar3coords
 			}
 			current = AstarHex[lowestPathPos];
 			UnityEngine.Debug.Log("current Hex: " + current.xCoordinate + ", " + current.yCoordinate + ", " + current.zCoordinate);
-			closedList.Enqueue(current);
+
+			if (closedList.Contains(current) == false) { closedList.Enqueue(current); }
 			AstarHex.Remove(current);
 			if (current.xCoordinate == objectX && current.yCoordinate == objectY && current.zCoordinate == objectZ) { abort = true; }
 
