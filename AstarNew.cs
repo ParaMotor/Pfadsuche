@@ -99,13 +99,13 @@ public class Astar3coords
 
 				neighborCost[i] = AstarIM.distance(neighbors[i].xCoordinate, neighbors[i].yCoordinate, neighbors[i].zCoordinate, objectX, objectY, objectZ);
 
-				if (closedList.Contains(neighbors[i])) {
+				if (closedList.Contains(neighbors[i]) && neighbors[i].xCoordinate != -1) {
 
 					continue;
 
 				}
 
-				if (AstarHex.Contains(neighbors[i]) == false)
+				if (AstarHex.Contains(neighbors[i]) == false && neighbors[i].xCoordinate != -1)
 				{
 
 					AstarHex.Add(new AstarHex() { xCoordinate = neighbors[i].xCoordinate, yCoordinate = neighbors[i].yCoordinate, zCoordinate = neighbors[i].zCoordinate, currentSteps = counter, leastStepsToGoal = AstarIM.distance(current.xCoordinate, current.yCoordinate, current.zCoordinate, objectX, objectY, objectZ) });
@@ -115,7 +115,7 @@ public class Astar3coords
 				}
 				else { 
 				
-					if(current.currentSteps + current.leastStepsToGoal < neighborCost[i].currentSteps + neighborCost[i].leastStepsToGoal)
+					if(current.currentSteps + current.leastStepsToGoal < neighborCost[i].currentSteps + neighborCost[i].leastStepsToGoal && neighbors[i].xCoordinate != -1)
                     {
 
 						AstarHex.Add(new AstarHex() { xCoordinate = neighbors[i].xCoordinate, yCoordinate = neighbors[i].yCoordinate, zCoordinate = neighbors[i].zCoordinate, currentSteps = counter, leastStepsToGoal = AstarIM.distance(current.xCoordinate, current.yCoordinate, current.zCoordinate, objectX, objectY, objectZ) });
