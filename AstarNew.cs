@@ -43,9 +43,17 @@ public class Astar3coords
 
 	Astar3coordsImportantMethods AstarIM = new Astar3coordsImportantMethods();
 
-	public void Astar(int maxX, int maxY, int objectX, int objectY, int objectZ, int startX, int startY, int startZ)
+	public void Astar(Hex objectT, Hex start)
 	{
 
+		int maxX = grid.gridWidth;
+		int maxY = grid.gridHeight;
+		int objectX = objectT.xCoordinate;
+		int objectY = objectT.yCoordinate;
+		int objectZ = objectT.zCoordinate;
+		int start = start.xCoordinate;
+		int startY = start.yCoordinate;
+		int startZ = start.zCoordinate;
 		Queue closedList = new Queue();
 		Boolean abort = false;
 		AstarHex current = new AstarHex();
@@ -53,9 +61,9 @@ public class Astar3coords
 		List<AstarHex> neighbors = new List<AstarHex>();
 		int[] neighborCost = new int[6];
 		int noWay = 0;
-		int oneNeighborCost = maxX + maxY;
+		int oneNeighborCost = maxX * maxY;
 		//int neighborIndex = 0;
-		int lowestPath = maxX + maxY;
+		int lowestPath = maxX * maxY;
 		int lowestPathPos = 0;
 
 		List<AstarHex> AstarHex = new List<AstarHex>();
@@ -65,7 +73,7 @@ public class Astar3coords
 		while (AstarHex.Count > 0 && abort == false)
 		{
 			noWay = 0;
-			lowestPath = maxX + maxY;
+			lowestPath = maxX * maxY;
 
 			for (int i = 0; i < AstarHex.Count(); i++)
 			{
@@ -80,6 +88,7 @@ public class Astar3coords
 
 			}
 			current = AstarHex[lowestPathPos];
+			UnityEngine.Debug.Log("current Hex: " + current.xCoordinate + ", " + current.yCoordinate + ", " + current.zCoordinate);
 			closedList.Enqueue(current);
 			AstarHex.Remove(current);
 			if (current.xCoordinate == objectX && current.yCoordinate == objectY && current.zCoordinate == objectZ) { abort = true; }
