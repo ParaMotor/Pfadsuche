@@ -108,9 +108,21 @@ public class Astar3coords
 				if (AstarHex.Contains(neighbors[i]) == false)
 				{
 
-					AstarHex.Add(new AstarHex() { xCoordinate = neighbors[i].xCoordinate, yCoordinate = neighbors[i].yCoordinate, zCoordinate = neighbors[i].zCoordinate, currentSteps = counter, leastStepsToGoal = AstarIM.distance(current.xCoordinate, current.yCoordinate, current.zCoordinate, objectX, objectY, objectZ)});
+					AstarHex.Add(new AstarHex() { xCoordinate = neighbors[i].xCoordinate, yCoordinate = neighbors[i].yCoordinate, zCoordinate = neighbors[i].zCoordinate, currentSteps = counter, leastStepsToGoal = AstarIM.distance(current.xCoordinate, current.yCoordinate, current.zCoordinate, objectX, objectY, objectZ) });
 					AstarHex[AstarHex.Count - 1].setPreviousA(current);
 					AstarHex[AstarHex.Count - 1].currentSteps = AstarHex[AstarHex.Count - 1].previousA.currentSteps + 1;
+
+				}
+				else { 
+				
+					if(current.currentSteps + current.leastStepsToGoal < neighborCost[i].currentSteps + neighborCost[i].leastStepsToGoal)
+                    {
+
+						AstarHex.Add(new AstarHex() { xCoordinate = neighbors[i].xCoordinate, yCoordinate = neighbors[i].yCoordinate, zCoordinate = neighbors[i].zCoordinate, currentSteps = counter, leastStepsToGoal = AstarIM.distance(current.xCoordinate, current.yCoordinate, current.zCoordinate, objectX, objectY, objectZ) });
+						AstarHex[AstarHex.Count - 1].setPreviousA(current);
+						AstarHex[AstarHex.Count - 1].currentSteps = AstarHex[AstarHex.Count - 1].previousA.currentSteps + 1;
+
+					}
 
 				}
 			
