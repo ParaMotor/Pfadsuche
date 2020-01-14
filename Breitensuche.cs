@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class Tiefensuche : MonoBehaviour
+public class Breitensuche : MonoBehaviour
 {
 
     Boolean wait = false;
@@ -23,10 +23,9 @@ public class Tiefensuche : MonoBehaviour
     public Boolean nextStep = false;    //führt den nächsten Schritt im Stepmodus aus
     public Boolean prevStep = false;    //geht ein Schritt zurück im Stepmode
     int thisNeighbors;                  //Zählt wie viele Nachbarn das Aktuelle Hex in die Algolist geschrieben hat
-    List<int> iNeighbors = new List<int>();
+    List<List<Hex>> iNeighbors = new List<List<Hex>>();
     List<Hex> StepList = new List<Hex>();
-    public List<Hex> pathList;
- 
+
     //Variablen zur Performancemessung
     Stopwatch stopwatch;
     int delay;
@@ -52,7 +51,7 @@ public class Tiefensuche : MonoBehaviour
         UnityEngine.Debug.Log(steps + " Schritte wurden benötigt");
         ZeitfürStats = stopwatch.ElapsedTicks / 10000.0;
         UnityEngine.Debug.Log(ZeitfürStats + " ms");
-        
+
 
         //neu Initialisieren
         GetComponent<Grid>().ClearGrid(); //Zurücksetzen des Grids
@@ -84,8 +83,7 @@ public class Tiefensuche : MonoBehaviour
             AlgoList.Clear();
             UnityEngine.Debug.Log("Suchalgorithmus abgebrochen");
             stopwatch.Stop();
-        }        
-
+        }
         if (step)
         {
             if (Input.GetKeyDown(KeyCode.RightArrow))
@@ -101,14 +99,14 @@ public class Tiefensuche : MonoBehaviour
                 else
                     UnityEngine.Debug.Log("Ende nicht erreichbar");
             }
-            if(Input.GetKeyDown(KeyCode.LeftArrow))
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 if (current.getPrevious() != null)
                     PreviousStep();
                 prevStep = false;
             }
         }
-        
+
     }
 
     //Suchfunktion
@@ -118,11 +116,11 @@ public class Tiefensuche : MonoBehaviour
         {
             if (wait == false)
             {
-                current = AlgoList[AlgoList.Count - 1]; //aktuelles Hex aktualisieren
+                current = AlgoList[0]; //aktuelles Hex aktualisieren
                 current.ChangeColor(0);
                 StepList.Add(current);
                 UnityEngine.Debug.Log("current Hex: " + current.xCoordinate + ", " + current.yCoordinate);
-                AlgoList.RemoveAt(AlgoList.Count - 1); //letztes Element aus liste holen
+                AlgoList.RemoveAt(0); //letztes Element aus liste holen
                 AddNeighborsToList(); // Nachbarn in Liste einfügen
                 wait = true;
                 steps++;
@@ -145,10 +143,7 @@ public class Tiefensuche : MonoBehaviour
         {
 
             if (Ende.GetEntdeckt() == true)
-            {
                 path = new CreatePath(Ende); //erstellen des Pfades
-                pathList = path.path;
-            }
             else
                 UnityEngine.Debug.Log("Ende nicht erreichbar");
             AlgoList.Clear(); //Liste leeren
@@ -161,21 +156,20 @@ public class Tiefensuche : MonoBehaviour
     private void AddNeighborsToList()
     {
         List<Hex> Neighbors = current.getNachbarn(); //neue Hexarray erstellen und Nachbarn vom aktuellen Hex einholen
-        thisNeighbors = 0;
+        List<Hex> help = new List<Hex>();
 
         foreach (Hex g in Neighbors)
         {
             if (!g.GetEntdeckt() && g.getBetretbar()) //nachbarn, falls unentdeckt, in liste einfügen
             {
                 AlgoList.Add(g);
+                help.Add(g);
                 g.setPrevious(current); // vorheriges Element setzen
                 //Hex-Farbe in wartefarbe ändern
                 g.SetEntdeckt(true); //aktuelles Hex als entdeckt makieren  
-                thisNeighbors++;    //Anzahl der für dieses Element hinzugefügten Element erhöhen
+                iNeighbors.Add(help);    //Anzahl der für dieses Element hinzugefügten Element erhöhen
             }
         }
-        iNeighbors.Add(thisNeighbors);
-        UnityEngine.Debug.Log(thisNeighbors);
     }
 
     //Algoritmus durchlauf zur Performancemessung ohne Darstellung
@@ -183,7 +177,7 @@ public class Tiefensuche : MonoBehaviour
     {
         while (Ende.GetEntdeckt() == false && AlgoList.Count > 0)
         {
-            current = AlgoList[AlgoList.Count - 1]; //aktuelles Hex aktualisieren
+            current = AlgoList[AlgoList.Count - 1]; //aktuelles Hex     aktualisieren
             AlgoList.RemoveAt(AlgoList.Count - 1); //letztes Element aus liste holen
             AddNeighborsToList(); // Nachbarn in Liste einfügen
             steps++;
@@ -199,28 +193,33 @@ public class Tiefensuche : MonoBehaviour
         AddNeighborsToList();        //Nachbarn in Warteschlangeliste eintragen      
         StepList.Add(current);
         steps++;
+        iNeighbors.Clear();
     }
 
     //Methode um im Stepmode ein Schritt zurück zu gehen
     private void PreviousStep()
     {
+        foreach (Hex g in iNeighbors[iNeighbors.Count - 1])
+        {
+            AlgoList[AlgoList.IndexOf(g)].ResetColor();
+            AlgoList[AlgoList.IndexOf(g)].SetEntdeckt(false);
+            UnityEngine.Debug.Log("5");
+            AlgoList.RemoveAt(AlgoList.IndexOf(g));
+            UnityEngine.Debug.Log("6");
+        }       
+
         current.ChangeColor(2);
-        AlgoList.Add(current);
-        if(StepList[StepList.Count - 2] != null)
-            current = StepList[StepList.Count - 2];
-
-        if (StepList[StepList.Count - 1].getPrevious() == current || iNeighbors[iNeighbors.Count - 1] != 0)
-            for (int i = 0; i < iNeighbors[iNeighbors.Count - 1]; i++)
-            {
-                AlgoList[AlgoList.Count - 2].SetEntdeckt(false);
-                AlgoList[AlgoList.Count - 2].ResetColor();
-                AlgoList.RemoveAt(AlgoList.Count - 2);
-            }        
+        AlgoList.Add(null);
+        for (int i = 1; i < AlgoList.Count; i++)
+            AlgoList[i] = AlgoList[i - 1];
+        AlgoList[0] = StepList[StepList.Count-1];
+        current = StepList[StepList.Count - 2];
+        
         iNeighbors.RemoveAt(iNeighbors.Count - 1);
+        UnityEngine.Debug.Log("7");
         StepList.RemoveAt(StepList.Count - 1);
+        UnityEngine.Debug.Log("8");
     }
-
-    
 }
 
 
