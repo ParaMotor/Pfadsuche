@@ -98,16 +98,17 @@ public class Grid : MonoBehaviour
         for (int i = 0; i < HexList.Count; i++)
         {
             //Alle zwei Reihen Width um 1 verringern
-            if (i % (2 * gridWidth) == 0 && i!=0)
+            if (i % (2 * gridWidth) == 0 && i != 0)
+            {
+                xStart--;
                 Width--;
-                xStart--;            
-            
+            }
             //Nachbarn rechts
             if (HexList[i].xCoordinate < Width)
                 HexList[i].addNachbar(HexList[i + 1]);
             //Nachbarn links
             if (HexList[i].xCoordinate > xStart)
-                HexList[i].addNachbar(HexList[i - 1]); //Hier fehler 
+                HexList[i].addNachbar(HexList[i - 1]);  
             //Nachbarn unten links bei geradem Y
             if (HexList[i].yCoordinate % 2 == 0 && HexList[i].xCoordinate > xStart && HexList[i].yCoordinate < Height)
                 HexList[i].addNachbar(HexList[i + Height]);
@@ -115,7 +116,7 @@ public class Grid : MonoBehaviour
             if (HexList[i].yCoordinate % 2 == 1 && HexList[i].xCoordinate >= xStart && HexList[i].yCoordinate < Height)
                 HexList[i].addNachbar(HexList[i + gridWidth]);
             //Nachbarn unten rechts bei geradem Y
-            if (HexList[i].yCoordinate % 2 == 0 && HexList[i].xCoordinate < Width && HexList[i].yCoordinate < Height)
+            if (HexList[i].yCoordinate % 2 == 0 && HexList[i].xCoordinate <= Width && HexList[i].yCoordinate < Height)
                 HexList[i].addNachbar(HexList[i + gridWidth]);
             //Nachbarn unten rechts bei ungeradem Y
             if (HexList[i].yCoordinate % 2 == 1 && HexList[i].xCoordinate < Width && HexList[i].yCoordinate < Height)
@@ -131,7 +132,9 @@ public class Grid : MonoBehaviour
                 HexList[i].addNachbar(HexList[i - gridWidth]);
             //Nachbarn oben rechts bei ungeradem Y
             if (HexList[i].yCoordinate % 2 == 1 && HexList[i].xCoordinate < Width && HexList[i].yCoordinate != 0)
-                HexList[i].addNachbar(HexList[i - Height]);         
+                HexList[i].addNachbar(HexList[i - Height]);
+            
+            
         }
     }
 
