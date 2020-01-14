@@ -19,20 +19,21 @@ public class Grid : MonoBehaviour
     Vector3 startPos;
 
     //Liste, in der die Koordinaten der Hexagone gespeichert werden sollen
-    List<Hex> HexList = new List<Hex>
+    public List<Hex> HexList = new List<Hex>
     {
 
     };
 
     //prinzipelle Main Methode
-    void Start()
+    public void Beginn(int groesse)
     {
+        gridWidth = groesse;
+        gridHeight = groesse;
 
         CalcStartPos();
         CreateGrid();
+
         
-        
-        Tiefensuche search = new Tiefensuche(HexList[5], HexList[45]);
         //Das ist nur was zum testen :D
         print(HexList[0].xCoordinate + "|" + HexList[0].yCoordinate);
         print(HexList.Count);
@@ -67,33 +68,44 @@ public class Grid : MonoBehaviour
     //Grid erstellen
     void CreateGrid()
     {
+        int x = 0;
+        int xtemp = 0;
+        Astar3coords astar = new Astar3coords();
+
         for (int y = 0; y < gridHeight; y++)
         {
-            for (int x = 0; x < gridWidth; x++)
+            xtemp = y / 2;
+            x = 0 - xtemp;
+            for (int xsize = 0; xsize < gridWidth; xsize++)
             {
                 //Objekt Hex erstellen, nach Vorlage von HexPrefab
                 Transform hex = Instantiate(hexPrefab) as Transform;
-                Vector2 gridPos = new Vector2(x, y);
+                Vector2 gridPos = new Vector2(xsize, y);
                 hex.position = CalcWorldPos(gridPos);
-                hex.parent = this.transform;
+                hex.SetParent(this.transform);
                 hex.name = "Hexagon" + x + "|" + y;
-                HexList.Add(hex.GetComponent<Hex>());//new Hex() { xCoordinate = x, yCoordinate = y }
+                HexList.Add(hex.GetComponent<Hex>());
                 hex.GetComponent<Hex>().SetX(x);
                 hex.GetComponent<Hex>().SetY(y);
+                hex.GetComponent<Hex>().SetZ(x + y);
+                x++;
+
             }
         }
         int Width = gridWidth - 1;
         int Height = gridHeight - 1;
+        int counter = -1;
+        int row = 0;
 
-        for (int i=0; i<HexList.Count; i++)
+        for (int i = 0; i < HexList.Count; i++)
         {
-            if (HexList[i].xCoordinate < Width)
+            if (HexList[i].xCoordinate < Width - row)
                 HexList[i].addNachbar(HexList[i + 1]);
-            
-            if (HexList[i].xCoordinate > 0)
+
+            if (HexList[i].xCoordinate > 0 - row)
                 HexList[i].addNachbar(HexList[i - 1]);
 
-            if (HexList[i].yCoordinate < Height)
+            if (HexList[i].yCoordinate < Height) //abwechselnd unten links/unten rechts
                 HexList[i].addNachbar(HexList[i + gridWidth]);
 
             if (HexList[i].yCoordinate < Height && HexList[i].yCoordinate % 2 == 1 && HexList[i].xCoordinate < Width)
@@ -102,7 +114,7 @@ public class Grid : MonoBehaviour
             if (HexList[i].yCoordinate < Height && HexList[i].yCoordinate % 2 == 0 && HexList[i].xCoordinate > 0)
                 HexList[i].addNachbar(HexList[i + gridWidth - 1]);
 
-            if (HexList[i].yCoordinate > 0)
+            if (HexList[i].yCoordinate > 0) //abwechselnd oben links/oben rechts
                 HexList[i].addNachbar(HexList[i - gridWidth]);
 
             if (HexList[i].yCoordinate > 0 && HexList[i].yCoordinate % 2 == 1 && HexList[i].xCoordinate < Width)
@@ -110,6 +122,37 @@ public class Grid : MonoBehaviour
 
             if (HexList[i].yCoordinate > 0 && HexList[i].yCoordinate % 2 == 0 && HexList[i].xCoordinate > 0)
                 HexList[i].addNachbar(HexList[i - gridWidth - 1]);
+
+            counter++;
+            row = counter / gridWidth;
         }
+    }
+
+    public void ClearGrid()
+    {
+        foreach(Hex g in HexList)
+        {
+            g.setPrevious(null);
+            g.ChangeColor(6); 
+        }
+    }
+
+    public void DestroyGrid()
+    {
+        foreach(Hex g in HexList)
+        {
+            Debug.Log("Entferne Hex: " + g.xCoordinate + ", " + g.yCoordinate);
+            g.Destroy();
+        }
+        HexList.Clear();
+    }
+
+    public Hex GetClicked()
+    {
+        foreach(Hex g in HexList)
+        {
+            if (g.clicked == true) return g;
+        }
+        return null;
     }
 }
