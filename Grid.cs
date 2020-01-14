@@ -10,11 +10,14 @@ public class Grid : MonoBehaviour
     //Definition Gridgröße 
     public int gridWidth;
     public int gridHeight;
-    //public int griddiagonale = 0;             //Da das Hexagonförmige Grid aktuell keine Lust hat, erstmal ein Viereckiges, das wird behoben !!
-
+    
     //Definition des Hexagons (Größe)
     float hexWidth = 1.73f;
     float hexHeight = 2.0f;
+
+    //Delay für Suchfunktionen
+    public float searchDelay;
+
 
     Vector3 startPos;
 
@@ -33,10 +36,6 @@ public class Grid : MonoBehaviour
         CalcStartPos();
         CreateGrid();
 
-        
-        //Das ist nur was zum testen :D
-        print(HexList[0].xCoordinate + "|" + HexList[0].yCoordinate);
-        print(HexList.Count);
     }
 
     //berechent Startposition
@@ -70,7 +69,7 @@ public class Grid : MonoBehaviour
     {
         int x = 0;
         int xtemp = 0;
-        Astar3coords astar = new Astar3coords();
+        //Astar3coords astar = new Astar3coords();
 
         for (int y = 0; y < gridHeight; y++)
         {
@@ -83,7 +82,7 @@ public class Grid : MonoBehaviour
                 Vector2 gridPos = new Vector2(xsize, y);
                 hex.position = CalcWorldPos(gridPos);
                 hex.SetParent(this.transform);
-                hex.name = "Hexagon" + x + "|" + y;
+                hex.name = "Hexagon" + x + "|" + y+"|"+(x+y);
                 HexList.Add(hex.GetComponent<Hex>());
                 hex.GetComponent<Hex>().SetX(x);
                 hex.GetComponent<Hex>().SetY(y);
@@ -94,65 +93,78 @@ public class Grid : MonoBehaviour
         }
         int Width = gridWidth - 1;
         int Height = gridHeight - 1;
-        int counter = -1;
-        int row = 0;
-
+        int xStart = 0;
+        
         for (int i = 0; i < HexList.Count; i++)
         {
-            if (HexList[i].xCoordinate < Width - row)
+            //Alle zwei Reihen Width um 1 verringern
+            if (i % (2 * gridWidth) == 0)
+                Width--;
+                xStart--;            
+            
+            //Nachbarn rechts
+            if (HexList[i].xCoordinate < Width)
                 HexList[i].addNachbar(HexList[i + 1]);
-
-            if (HexList[i].xCoordinate > 0 - row)
+            //Nachbarn links
+            if (HexList[i].xCoordinate > xStart)
                 HexList[i].addNachbar(HexList[i - 1]);
-
-            if (HexList[i].yCoordinate < Height) //abwechselnd unten links/unten rechts
+            //Nachbarn unten links bei geradem Y
+            if (HexList[i].yCoordinate % 2 == 0 && HexList[i].xCoordinate > xStart && HexList[i].yCoordinate < Height)
+                HexList[i].addNachbar(HexList[i + Height]);
+            //Nachbarn unten links bei ungeradem Y
+            if (HexList[i].yCoordinate % 2 == 1 && HexList[i].xCoordinate >= xStart && HexList[i].yCoordinate < Height)
                 HexList[i].addNachbar(HexList[i + gridWidth]);
-
-            if (HexList[i].yCoordinate < Height && HexList[i].yCoordinate % 2 == 1 && HexList[i].xCoordinate < Width)
-                HexList[i].addNachbar(HexList[i + gridWidth + 1]);
-
-            if (HexList[i].yCoordinate < Height && HexList[i].yCoordinate % 2 == 0 && HexList[i].xCoordinate > 0)
-                HexList[i].addNachbar(HexList[i + gridWidth - 1]);
-
-            if (HexList[i].yCoordinate > 0) //abwechselnd oben links/oben rechts
+            //Nachbarn unten rechts bei geradem Y
+            if (HexList[i].yCoordinate % 2 == 0 && HexList[i].xCoordinate < Width && HexList[i].yCoordinate < Height)
+                HexList[i].addNachbar(HexList[i + gridWidth]);
+            //Nachbarn unten rechts bei ungeradem Y
+            if (HexList[i].yCoordinate % 2 == 1 && HexList[i].xCoordinate < (Width-1) && HexList[i].yCoordinate < Height)
+                HexList[i].addNachbar(HexList[i + gridWidth +1]);
+            //Nachbarn oben links bei geradem Y > 0
+            if (HexList[i].yCoordinate % 2 == 0 && HexList[i].xCoordinate > xStart && HexList[i].yCoordinate !=0)
+                HexList[i].addNachbar(HexList[i - (gridWidth + 1)]);
+            //Nachbarn oben links bei ungeradem Y 
+            if (HexList[i].yCoordinate % 2 == 1 && HexList[i].xCoordinate <= Width && HexList[i].yCoordinate != 0)
                 HexList[i].addNachbar(HexList[i - gridWidth]);
-
-            if (HexList[i].yCoordinate > 0 && HexList[i].yCoordinate % 2 == 1 && HexList[i].xCoordinate < Width)
-                HexList[i].addNachbar(HexList[i - gridWidth + 1]);
-
-            if (HexList[i].yCoordinate > 0 && HexList[i].yCoordinate % 2 == 0 && HexList[i].xCoordinate > 0)
-                HexList[i].addNachbar(HexList[i - gridWidth - 1]);
-
-            counter++;
-            row = counter / gridWidth;
+            //Nachbarn oben rechts bei geradem Y > 0
+            if (HexList[i].yCoordinate % 2 == 0 && HexList[i].xCoordinate <= Width && HexList[i].yCoordinate != 0)
+                HexList[i].addNachbar(HexList[i - gridWidth]);
+            //Nachbarn oben rechts bei ungeradem Y
+            if (HexList[i].yCoordinate % 2 == 1 && HexList[i].xCoordinate < Width && HexList[i].yCoordinate != 0)
+                HexList[i].addNachbar(HexList[i - Height]);         
         }
     }
 
+    //Grid-funktionen
     public void ClearGrid()
     {
-        foreach(Hex g in HexList)
+        foreach (Hex g in HexList)
         {
             g.setPrevious(null);
-            g.ChangeColor(6); 
+            g.SetEntdeckt(false);
+            g.ChangeColor(6);
         }
     }
-
     public void DestroyGrid()
     {
-        foreach(Hex g in HexList)
+        foreach (Hex g in HexList)
         {
             Debug.Log("Entferne Hex: " + g.xCoordinate + ", " + g.yCoordinate);
             g.Destroy();
         }
         HexList.Clear();
     }
-
+    //Hexagon-funktionen
     public Hex GetClicked()
     {
-        foreach(Hex g in HexList)
+        foreach (Hex g in HexList)
         {
             if (g.clicked == true) return g;
         }
         return null;
+    }
+    public void SetSearchDelay(float delay)
+    {
+        searchDelay = delay;
     }
 }
