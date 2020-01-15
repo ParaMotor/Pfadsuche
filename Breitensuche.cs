@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,6 +25,7 @@ public class Breitensuche : MonoBehaviour
     int thisNeighbors;                  //Zählt wie viele Nachbarn das Aktuelle Hex in die Algolist geschrieben hat
     List<List<Hex>> iNeighbors = new List<List<Hex>>();
     List<Hex> StepList = new List<Hex>();
+    List<Hex> temp = new List<Hex>();
 
     //Variablen zur Performancemessung
     Stopwatch stopwatch;
@@ -167,9 +168,9 @@ public class Breitensuche : MonoBehaviour
                 g.setPrevious(current); // vorheriges Element setzen
                 //Hex-Farbe in wartefarbe ändern
                 g.SetEntdeckt(true); //aktuelles Hex als entdeckt makieren  
-                iNeighbors.Add(help);    //Anzahl der für dieses Element hinzugefügten Element erhöhen
             }
         }
+        iNeighbors.Add(help);    //Anzahl der für dieses Element hinzugefügten Element erhöhen
     }
 
     //Algoritmus durchlauf zur Performancemessung ohne Darstellung
@@ -199,27 +200,29 @@ public class Breitensuche : MonoBehaviour
     //Methode um im Stepmode ein Schritt zurück zu gehen
     private void PreviousStep()
     {
+        //Die Elemente die zuletzt zur Warteliste hinzugefügt wurden wieder entfernen
         foreach (Hex g in iNeighbors[iNeighbors.Count - 1])
         {
-            AlgoList[AlgoList.IndexOf(g)].ResetColor();
-            AlgoList[AlgoList.IndexOf(g)].SetEntdeckt(false);
-            UnityEngine.Debug.Log("5");
-            AlgoList.RemoveAt(AlgoList.IndexOf(g));
-            UnityEngine.Debug.Log("6");
-        }       
+            g.ResetColor();
+            g.SetEntdeckt(false);
+            AlgoList.Remove(g);
+        }
 
+        //aktuelles Element eins zurück setzen
         current.ChangeColor(2);
-        AlgoList.Add(null);
-        for (int i = 1; i < AlgoList.Count; i++)
-            AlgoList[i] = AlgoList[i - 1];
-        AlgoList[0] = StepList[StepList.Count-1];
-        current = StepList[StepList.Count - 2];
-        
+        current = StepList[StepList.Count - 2];        
+
+        //Algolist zurücksetzen
+        temp = AlgoList;
+        AlgoList.Add(new Hex());        
+        for (int i = AlgoList.Count-1; i > 0; i--)
+        {
+            AlgoList[i] = temp[i - 1];
+        }
+        AlgoList[0] = StepList[StepList.Count - 1];
+
+        //Entfernt die Letzen Element der Hilfslisten
         iNeighbors.RemoveAt(iNeighbors.Count - 1);
-        UnityEngine.Debug.Log("7");
         StepList.RemoveAt(StepList.Count - 1);
-        UnityEngine.Debug.Log("8");
     }
 }
-
-
