@@ -186,8 +186,8 @@ public class Grid : MonoBehaviour
                 wall1.Rotate(rotaReOb, Space.Self);
                 wall1.name = "Wall " + i + ".2";
             }
-                //Linke Seite, gerades Y 
-                if (HexList[i].xCoordinate == xStart && HexList[i].yCoordinate % 2 == 0)
+            //Linke Seite, gerades Y 
+            if (HexList[i].xCoordinate == xStart && HexList[i].yCoordinate % 2 == 0)
             {
                 //Wand oben links
                 Transform wall = Instantiate(WallPrefab) as Transform;
@@ -226,7 +226,6 @@ public class Grid : MonoBehaviour
                 wall.Rotate(rotaRe, Space.Self);
                 wall.name = "Wall " + i + ".3";                
             }
-
             //Rechts Seite, ungerades Y
             if (HexList[i].xCoordinate == Width && HexList[i].yCoordinate % 2 == 1)
             {
@@ -248,6 +247,31 @@ public class Grid : MonoBehaviour
                 wall2.Rotate(rotaReUn, Space.Self);
                 wall2.name = "Wall " + i + ".4";
             }
+            /*
+            //Wände letzte Reihe
+            if (HexList[i].yCoordinate == (gridHeight-1) && HexList[i].xCoordinate < Width )
+            {
+                //Wand unten links 
+                Transform wall = Instantiate(WallPrefab) as Transform;      
+                wall.position = new Vector3(xl+addx, hexPos.y, zu);              
+                wall.Rotate(rotaLiUn, Space.Self);                         
+                wall.name = "Wall " + i + ".5";                           
+
+                //Wand unten rechts
+                Transform wall1 = Instantiate(WallPrefab) as Transform;
+                wall1.position = new Vector3(xr+addx, hexPos.y, zu);
+                wall1.Rotate(rotaReUn, Space.Self);
+                wall1.name = "Wall " + i + ".4";
+            }
+            //Wand letztes Hex unten rechts
+            if (HexList[i].yCoordinate == (gridHeight-1) && HexList[i].xCoordinate == Width)
+            {
+                //Wand unten links 
+                Transform wall = Instantiate(WallPrefab) as Transform;
+                wall.position = new Vector3(xl + addx, hexPos.y, zu);
+                wall.Rotate(rotaLiUn, Space.Self);
+                wall.name = "Wall " + i + ".5";
+            } */
            // print("i: " + i + " addx: " + addx);
         }
     }
