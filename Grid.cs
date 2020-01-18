@@ -6,12 +6,13 @@ using UnityEngine;
 public class Grid : MonoBehaviour
 {
     public Transform hexPrefab;
+    public Transform WallPrefab;
 
     //Definition Gridgröße 
     public int gridWidth;
     public int gridHeight;
     
-    //Definition des Hexagons (Größe)
+    //Abmessungen der Hex für Berechungen
     float hexWidth = 1.73f;
     float hexHeight = 2.0f;
 
@@ -94,6 +95,7 @@ public class Grid : MonoBehaviour
         int Width = gridWidth - 1;
         int Height = gridHeight - 1;
         int xStart = 0;
+        float addx = 0;
         
         for (int i = 0; i < HexList.Count; i++)
         {
@@ -133,8 +135,120 @@ public class Grid : MonoBehaviour
             //Nachbarn oben rechts bei ungeradem Y
             if (HexList[i].yCoordinate % 2 == 1 && HexList[i].xCoordinate < Width && HexList[i].yCoordinate != 0)
                 HexList[i].addNachbar(HexList[i - Height]);
+
+
+            //Platzierung der Wände
             
+            //Positionsfindung im Grid und Unity Coordinatensystem
+            Vector2 gridPos = new Vector2(HexList[i].xCoordinate, HexList[i].yCoordinate);
+            Vector3 hexPos = CalcWorldPos(gridPos);
+            //Vektoren für Rotationen der Wände
+            Vector3 rotaLiOb = new Vector3(0, 0, 60);
+            Vector3 rotaReOb = new Vector3(0, 0, 120);
+            Vector3 rotaLiUn = new Vector3(0, 0, -60);
+            Vector3 rotaReUn = new Vector3(0, 0, 240);
+            Vector3 rotaLi = new Vector3(0, 0, 0);
+            Vector3 rotaRe = new Vector3(0, 0, 180);
             
+            //Variablen für Positionierung der Wände
+            float xr = hexPos.x + 0.44f;
+            float xl = hexPos.x - 0.44f;
+            float zu = hexPos.z - 0.755f;
+            float zo = hexPos.z + 0.755f;
+
+            //Alle 2 Reihen einen zusätzlichen Faktor zur Platzierung 
+            if (i % (2*gridWidth) == 0 && HexList[i].yCoordinate > 0)
+            {
+                addx = (HexList[i].yCoordinate / 2 )* 1.73f;
+            }
+
+            // Oberste Reihe von links nach rechts ohne erstes und letztes Element
+            if (HexList[i].yCoordinate == 0 && HexList[i].xCoordinate > 0 )
+            {
+                //Wand oben links 
+                Transform wall = Instantiate(WallPrefab) as Transform;      //WallPrefab als Objekt erstellen
+                wall.position = new Vector3(xl, hexPos.y, zo);              //Wall an Stelle xl, hexPos.y, zo platzieren
+                wall.Rotate(rotaLiOb, Space.Self);                          //Rotation um eigene Achse, nach Vektor
+                wall.name = "Wall " + i + ".1" ;                            //Bennenung Wand Oben links mit i.1 und weiter im Uhrzeigersinn
+
+                //Wand oben rechts
+                Transform wall1 = Instantiate(WallPrefab) as Transform;
+                wall1.position = new Vector3(xr, hexPos.y, zo);
+                wall1.Rotate(rotaReOb, Space.Self);
+                wall1.name = "Wall " + i + ".2";
+            }
+            //Für Hex 0/0/0 oben rechts
+            if (HexList[i].yCoordinate == 0 && HexList[i].xCoordinate == 0)
+            {
+                //Wand oben rechts
+                Transform wall1 = Instantiate(WallPrefab) as Transform;
+                wall1.position = new Vector3(xr, hexPos.y, zo);
+                wall1.Rotate(rotaReOb, Space.Self);
+                wall1.name = "Wall " + i + ".2";
+            }
+                //Linke Seite, gerades Y 
+                if (HexList[i].xCoordinate == xStart && HexList[i].yCoordinate % 2 == 0)
+            {
+                //Wand oben links
+                Transform wall = Instantiate(WallPrefab) as Transform;
+                wall.position = new Vector3(xl + addx, hexPos.y, zo);
+                wall.Rotate(rotaLiOb, Space.Self);
+                wall.name = "Wall " + i + ".1";
+
+                //Wand links
+                Transform wall1 = Instantiate(WallPrefab) as Transform;
+                wall1.position = new Vector3(hexPos.x - 0.865f + addx, hexPos.y, hexPos.z);
+                wall1.Rotate(rotaLi, Space.Self);
+                wall1.name = "Wall " + i + ".6";
+
+                //Wand unten links
+                Transform wall2 = Instantiate(WallPrefab) as Transform;
+                wall2.position = new Vector3(xl + addx, hexPos.y, zu);
+                wall2.Rotate(rotaLiUn, Space.Self);
+                wall2.name = "Wall " + i + ".5";
+            }
+            //Linke Seite, ungerades Y
+            if (HexList[i].xCoordinate == xStart && HexList[i].yCoordinate % 2 == 1)
+            {
+                //Wand links
+                Transform wall = Instantiate(WallPrefab) as Transform;
+                wall.position = new Vector3(hexPos.x - 0.865f + addx, hexPos.y, hexPos.z);
+                wall.Rotate(rotaLi, Space.Self);
+                wall.name = "Wall " + i + ".6";
+            }
+
+            //Rechte Seite, gerades Y 
+            if (HexList[i].xCoordinate == Width && HexList[i].yCoordinate % 2 == 0)
+            {
+                //Wand rechts
+                Transform wall = Instantiate(WallPrefab) as Transform;
+                wall.position = new Vector3(hexPos.x + 0.865f + addx, hexPos.y, hexPos.z);
+                wall.Rotate(rotaRe, Space.Self);
+                wall.name = "Wall " + i + ".3";                
+            }
+
+            //Rechts Seite, ungerades Y
+            if (HexList[i].xCoordinate == Width && HexList[i].yCoordinate % 2 == 1)
+            {
+                //Wand rechts
+                Transform wall = Instantiate(WallPrefab) as Transform;
+                wall.position = new Vector3(hexPos.x + 0.865f + addx, hexPos.y, hexPos.z);
+                wall.Rotate(rotaRe, Space.Self);
+                wall.name = "Wall " + i + ".3";
+
+                //Wand oben rechts
+                Transform wall1 = Instantiate(WallPrefab) as Transform;
+                wall1.position = new Vector3(xr + addx, hexPos.y, zo);
+                wall1.Rotate(rotaReOb, Space.Self);
+                wall1.name = "Wall " + i + ".2";
+
+                //Wand unten rechts
+                Transform wall2 = Instantiate(WallPrefab) as Transform;
+                wall2.position = new Vector3(xr + addx, hexPos.y, zu);
+                wall2.Rotate(rotaReUn, Space.Self);
+                wall2.name = "Wall " + i + ".4";
+            }
+           // print("i: " + i + " addx: " + addx);
         }
     }
 
