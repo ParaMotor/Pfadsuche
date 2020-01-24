@@ -36,7 +36,7 @@ public class Grid : MonoBehaviour
         gridWidth = groesse;
         gridHeight = groesse;
 
-        CalcStartPos();
+        //CalcStartPos();
         startPos = new Vector3(0, 0, 0);
         CreateGrid();
 
