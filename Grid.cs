@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,11 +7,12 @@ public class Grid : MonoBehaviour
 {
     public Transform hexPrefab;
     public Transform WallPrefab;
+    public Transform camera;
 
     //Definition Gridgröße 
     public int gridWidth;
     public int gridHeight;
-    
+
     //Abmessungen der Hex für Berechungen
     float hexWidth = 1.73f;
     float hexHeight = 2.0f;
@@ -27,6 +28,7 @@ public class Grid : MonoBehaviour
     {
 
     };
+    List<Transform> WallList = new List<Transform>();
 
     //prinzipelle Main Methode
     public void Beginn(int groesse)
@@ -35,8 +37,11 @@ public class Grid : MonoBehaviour
         gridHeight = groesse;
 
         CalcStartPos();
+        startPos = new Vector3(0, 0, 0);
         CreateGrid();
 
+        camera.position = HexList[HexList.Count - 1].getTransform().position / 2 + new Vector3(0, 1, 0);
+        camera.GetComponent<Camera>().orthographicSize = gridHeight;
     }
 
     //berechent Startposition
@@ -83,7 +88,7 @@ public class Grid : MonoBehaviour
                 Vector2 gridPos = new Vector2(xsize, y);
                 hex.position = CalcWorldPos(gridPos);
                 hex.SetParent(this.transform);
-                hex.name = "Hexagon" + x + "|" + y+"|"+(x+y);
+                hex.name = "Hexagon" + x + "|" + y + "|" + (x + y);
                 HexList.Add(hex.GetComponent<Hex>());
                 hex.GetComponent<Hex>().SetX(x);
                 hex.GetComponent<Hex>().SetY(y);
@@ -96,7 +101,7 @@ public class Grid : MonoBehaviour
         int Height = gridHeight - 1;
         int xStart = 0;
         float addx = 0;
-        
+
         for (int i = 0; i < HexList.Count; i++)
         {
             //Alle zwei Reihen Width um 1 verringern
@@ -110,7 +115,7 @@ public class Grid : MonoBehaviour
                 HexList[i].addNachbar(HexList[i + 1]);
             //Nachbarn links
             if (HexList[i].xCoordinate > xStart)
-                HexList[i].addNachbar(HexList[i - 1]);  
+                HexList[i].addNachbar(HexList[i - 1]);
             //Nachbarn unten links bei geradem Y
             if (HexList[i].yCoordinate % 2 == 0 && HexList[i].xCoordinate > xStart && HexList[i].yCoordinate < Height)
                 HexList[i].addNachbar(HexList[i + Height]);
@@ -122,9 +127,9 @@ public class Grid : MonoBehaviour
                 HexList[i].addNachbar(HexList[i + gridWidth]);
             //Nachbarn unten rechts bei ungeradem Y
             if (HexList[i].yCoordinate % 2 == 1 && HexList[i].xCoordinate < Width && HexList[i].yCoordinate < Height)
-                HexList[i].addNachbar(HexList[i + gridWidth +1]);
+                HexList[i].addNachbar(HexList[i + gridWidth + 1]);
             //Nachbarn oben links bei geradem Y > 0
-            if (HexList[i].yCoordinate % 2 == 0 && HexList[i].xCoordinate > xStart && HexList[i].yCoordinate !=0)
+            if (HexList[i].yCoordinate % 2 == 0 && HexList[i].xCoordinate > xStart && HexList[i].yCoordinate != 0)
                 HexList[i].addNachbar(HexList[i - (gridWidth + 1)]);
             //Nachbarn oben links bei ungeradem Y 
             if (HexList[i].yCoordinate % 2 == 1 && HexList[i].xCoordinate <= Width && HexList[i].yCoordinate != 0)
@@ -138,7 +143,7 @@ public class Grid : MonoBehaviour
 
 
             //Platzierung der Wände
-            
+
             //Positionsfindung im Grid und Unity Coordinatensystem
             Vector2 gridPos = new Vector2(HexList[i].xCoordinate, HexList[i].yCoordinate);
             Vector3 hexPos = CalcWorldPos(gridPos);
@@ -149,7 +154,7 @@ public class Grid : MonoBehaviour
             Vector3 rotaReUn = new Vector3(0, 0, 240);
             Vector3 rotaLi = new Vector3(0, 0, 0);
             Vector3 rotaRe = new Vector3(0, 0, 180);
-            
+
             //Variablen für Positionierung der Wände
             float xr = hexPos.x + 0.44f;
             float xl = hexPos.x - 0.44f;
@@ -157,24 +162,22 @@ public class Grid : MonoBehaviour
             float zo = hexPos.z + 0.755f;
 
             //Alle 2 Reihen einen zusätzlichen Faktor zur Platzierung 
-            if (i % (2*gridWidth) == 0 && HexList[i].yCoordinate > 0)
+            if (i % (2 * gridWidth) == 0 && HexList[i].yCoordinate > 0)
             {
-                addx = (HexList[i].yCoordinate / 2 )* 1.73f;
+                addx = (HexList[i].yCoordinate / 2) * 1.73f;
             }
 
             // Oberste Reihe von links nach rechts ohne erstes und letztes Element
-            if (HexList[i].yCoordinate == 0 && HexList[i].xCoordinate > 0 )
+            if (HexList[i].yCoordinate == 0 && HexList[i].xCoordinate > 0)
             {
                 //Wand oben links 
-                Transform wall = Instantiate(WallPrefab) as Transform;      //WallPrefab als Objekt erstellen
-                wall.position = new Vector3(xl, hexPos.y, zo);              //Wall an Stelle xl, hexPos.y, zo platzieren
-                wall.Rotate(rotaLiOb, Space.Self);                          //Rotation um eigene Achse, nach Vektor
-                wall.name = "Wall " + i + ".1" ;                            //Bennenung Wand Oben links mit i.1 und weiter im Uhrzeigersinn
+                Transform wall = Instantiate(WallPrefab) as Transform;      //WallPrefab als Objekt erstellen                           
+                WallInit(wall, xl, hexPos.y, zo, rotaLiOb);
+                wall.name = "Wall " + i + ".1";                            //Bennenung Wand Oben links mit i.1 und weiter im Uhrzeigersinn
 
                 //Wand oben rechts
                 Transform wall1 = Instantiate(WallPrefab) as Transform;
-                wall1.position = new Vector3(xr, hexPos.y, zo);
-                wall1.Rotate(rotaReOb, Space.Self);
+                WallInit(wall1, xr, hexPos.y, zo, rotaReOb);
                 wall1.name = "Wall " + i + ".2";
             }
             //Für Hex 0/0/0 oben rechts
@@ -182,8 +185,7 @@ public class Grid : MonoBehaviour
             {
                 //Wand oben rechts
                 Transform wall1 = Instantiate(WallPrefab) as Transform;
-                wall1.position = new Vector3(xr, hexPos.y, zo);
-                wall1.Rotate(rotaReOb, Space.Self);
+                WallInit(wall1, xr, hexPos.y, zo, rotaReOb);
                 wall1.name = "Wall " + i + ".2";
             }
             //Linke Seite, gerades Y 
@@ -191,20 +193,17 @@ public class Grid : MonoBehaviour
             {
                 //Wand oben links
                 Transform wall = Instantiate(WallPrefab) as Transform;
-                wall.position = new Vector3(xl + addx, hexPos.y, zo);
-                wall.Rotate(rotaLiOb, Space.Self);
+                WallInit(wall, xl + addx, hexPos.y, zo, rotaLiOb);
                 wall.name = "Wall " + i + ".1";
 
                 //Wand links
                 Transform wall1 = Instantiate(WallPrefab) as Transform;
-                wall1.position = new Vector3(hexPos.x - 0.865f + addx, hexPos.y, hexPos.z);
-                wall1.Rotate(rotaLi, Space.Self);
+                WallInit(wall1, hexPos.x - 0.865f + addx, hexPos.y, hexPos.z, rotaLi);
                 wall1.name = "Wall " + i + ".6";
 
                 //Wand unten links
                 Transform wall2 = Instantiate(WallPrefab) as Transform;
-                wall2.position = new Vector3(xl + addx, hexPos.y, zu);
-                wall2.Rotate(rotaLiUn, Space.Self);
+                WallInit(wall2, xl + addx, hexPos.y, zu, rotaLiUn);
                 wall2.name = "Wall " + i + ".5";
             }
             //Linke Seite, ungerades Y
@@ -212,8 +211,7 @@ public class Grid : MonoBehaviour
             {
                 //Wand links
                 Transform wall = Instantiate(WallPrefab) as Transform;
-                wall.position = new Vector3(hexPos.x - 0.865f + addx, hexPos.y, hexPos.z);
-                wall.Rotate(rotaLi, Space.Self);
+                WallInit(wall, hexPos.x - 0.865f + addx, hexPos.y, hexPos.z, rotaLi);
                 wall.name = "Wall " + i + ".6";
             }
 
@@ -222,45 +220,39 @@ public class Grid : MonoBehaviour
             {
                 //Wand rechts
                 Transform wall = Instantiate(WallPrefab) as Transform;
-                wall.position = new Vector3(hexPos.x + 0.865f + addx, hexPos.y, hexPos.z);
-                wall.Rotate(rotaRe, Space.Self);
-                wall.name = "Wall " + i + ".3";                
+                WallInit(wall, hexPos.x + 0.865f + addx, hexPos.y, hexPos.z, rotaRe);
+                wall.name = "Wall " + i + ".3";
             }
             //Rechts Seite, ungerades Y
             if (HexList[i].xCoordinate == Width && HexList[i].yCoordinate % 2 == 1)
             {
                 //Wand rechts
                 Transform wall = Instantiate(WallPrefab) as Transform;
-                wall.position = new Vector3(hexPos.x + 0.865f + addx, hexPos.y, hexPos.z);
-                wall.Rotate(rotaRe, Space.Self);
+                WallInit(wall, hexPos.x + 0.865f + addx, hexPos.y, hexPos.z, rotaRe);
                 wall.name = "Wall " + i + ".3";
 
                 //Wand oben rechts
                 Transform wall1 = Instantiate(WallPrefab) as Transform;
-                wall1.position = new Vector3(xr + addx, hexPos.y, zo);
-                wall1.Rotate(rotaReOb, Space.Self);
+                WallInit(wall1, xr + addx, hexPos.y, zo, rotaReOb);
                 wall1.name = "Wall " + i + ".2";
 
                 //Wand unten rechts
                 Transform wall2 = Instantiate(WallPrefab) as Transform;
-                wall2.position = new Vector3(xr + addx, hexPos.y, zu);
-                wall2.Rotate(rotaReUn, Space.Self);
+                WallInit(wall2, xr + addx, hexPos.y, zu, rotaReUn);
                 wall2.name = "Wall " + i + ".4";
             }
-            /*
+            
             //Wände letzte Reihe
             if (HexList[i].yCoordinate == (gridHeight-1) && HexList[i].xCoordinate < Width )
             {
                 //Wand unten links 
-                Transform wall = Instantiate(WallPrefab) as Transform;      
-                wall.position = new Vector3(xl+addx, hexPos.y, zu);              
-                wall.Rotate(rotaLiUn, Space.Self);                         
+                Transform wall = Instantiate(WallPrefab) as Transform;    
+                WallInit(wall, xl + addx, hexPos.y, zu, rotaLiUn);
                 wall.name = "Wall " + i + ".5";                           
 
                 //Wand unten rechts
                 Transform wall1 = Instantiate(WallPrefab) as Transform;
-                wall1.position = new Vector3(xr+addx, hexPos.y, zu);
-                wall1.Rotate(rotaReUn, Space.Self);
+                WallInit(wall1, xr + addx, hexPos.y, zu, rotaReUn);
                 wall1.name = "Wall " + i + ".4";
             }
             //Wand letztes Hex unten rechts
@@ -268,11 +260,10 @@ public class Grid : MonoBehaviour
             {
                 //Wand unten links 
                 Transform wall = Instantiate(WallPrefab) as Transform;
-                wall.position = new Vector3(xl + addx, hexPos.y, zu);
-                wall.Rotate(rotaLiUn, Space.Self);
+                WallInit(wall, xl + addx, hexPos.y, zu, rotaLiUn);
                 wall.name = "Wall " + i + ".5";
-            } */
-           // print("i: " + i + " addx: " + addx);
+            } 
+            // print("i: " + i + " addx: " + addx);
         }
     }
 
@@ -293,8 +284,12 @@ public class Grid : MonoBehaviour
             Debug.Log("Entferne Hex: " + g.xCoordinate + ", " + g.yCoordinate);
             g.Destroy();
         }
+        foreach (Transform w in WallList)
+            Destroy(w.gameObject);
+        WallList.Clear();
         HexList.Clear();
     }
+
     //Hexagon-funktionen
     public Hex GetClicked()
     {
@@ -307,5 +302,13 @@ public class Grid : MonoBehaviour
     public void SetSearchDelay(float delay)
     {
         searchDelay = delay;
+    }
+
+    //Wand-funktion
+    void WallInit(Transform wall, float x, float y, float z, Vector3 Rotation)
+    {
+        wall.position = new Vector3(x, y, z);       //Wall an Stelle xl, hexPos.y, zo platzieren
+        wall.Rotate(Rotation, Space.Self);          //Rotation um eigene Achse, nach Vektor
+        WallList.Add(wall);
     }
 }
