@@ -13,26 +13,29 @@ public class Tiefensuche : MonoBehaviour
     Hex current;
     CreatePath path;
 
+    public int entdeckt = 0;
+
+    //Zu übergebende Start- und Zielobjekte
     public Hex Start { get; set; }
     public Hex Ende { get; set; }
-    public Double ZeitfürStats { get; set; }
     public Boolean run = false;
+    public Transform character;
 
     //Werte für Einzelschritte
     public Boolean step = true;         //soll Steuern, ob der Stepmodus aktiviert werden soll
-    public Boolean nextStep = false;    //führt den nächsten Schritt im Stepmodus aus
-    public Boolean prevStep = false;    //geht ein Schritt zurück im Stepmode
     int thisNeighbors;                  //Zählt wie viele Nachbarn das Aktuelle Hex in die Algolist geschrieben hat
     List<int> iNeighbors = new List<int>();
     List<Hex> StepList = new List<Hex>();
     public List<Hex> pathList;
- 
+
     //Variablen zur Performancemessung
     Stopwatch stopwatch;
+    public Double ZeitfürStats { get; set; }
     int delay;
     int setTimer;
     int counter;
     int steps = 0;
+    
 
     //Hauptprogramm
     public void Anfang()
@@ -49,10 +52,10 @@ public class Tiefensuche : MonoBehaviour
         stopwatch.Stop(); //Stopuhr anhalten
 
         //Debug zur Dauer des Algorithmus
-        UnityEngine.Debug.Log(steps + " Schritte wurden benötigt");
+        //UnityEngine.Debug.Log(steps + " Schritte wurden benötigt");
         ZeitfürStats = stopwatch.ElapsedTicks / 10000.0;
         UnityEngine.Debug.Log(ZeitfürStats + " ms");
-        
+
 
         //neu Initialisieren
         GetComponent<Grid>().ClearGrid(); //Zurücksetzen des Grids
@@ -75,7 +78,10 @@ public class Tiefensuche : MonoBehaviour
         }
 
         if (Start != null && run && !step)
+        {
             SearchGrid();
+            steps++;
+        }
 
         //Abbruch des Algorithmus
         if (Start != null && !run)
@@ -83,8 +89,7 @@ public class Tiefensuche : MonoBehaviour
             Start = null;
             AlgoList.Clear();
             UnityEngine.Debug.Log("Suchalgorithmus abgebrochen");
-            stopwatch.Stop();
-        }        
+        }
 
         if (step)
         {
@@ -94,21 +99,27 @@ public class Tiefensuche : MonoBehaviour
                 {
                     wait = false;
                     SearchGrid();
-                    nextStep = false;
+                    steps++;
                 }
                 else if (Ende.GetEntdeckt() == true)
+                {
                     path = new CreatePath(Ende); //erstellen des Pfades
+                    pathList = path.path;
+                    character.GetComponent<CharacterScript>().Init(pathList);
+                }
                 else
                     UnityEngine.Debug.Log("Ende nicht erreichbar");
             }
-            if(Input.GetKeyDown(KeyCode.LeftArrow))
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 if (current.getPrevious() != null)
+                {
                     PreviousStep();
-                prevStep = false;
+                    steps--;
+                }
             }
         }
-        
+
     }
 
     //Suchfunktion
@@ -125,7 +136,6 @@ public class Tiefensuche : MonoBehaviour
                 AlgoList.RemoveAt(AlgoList.Count - 1); //letztes Element aus liste holen
                 AddNeighborsToList(); // Nachbarn in Liste einfügen
                 wait = true;
-                steps++;
             }
             else //wartefunktiion
             {
@@ -141,18 +151,22 @@ public class Tiefensuche : MonoBehaviour
 
             }
         }
-        else // Anschluss des Algortihmus
+        else // Abschluss des Algortihmus
         {
-
             if (Ende.GetEntdeckt() == true)
             {
                 path = new CreatePath(Ende); //erstellen des Pfades
                 pathList = path.path;
+                character.GetComponent<CharacterScript>().Init(pathList);
             }
             else
                 UnityEngine.Debug.Log("Ende nicht erreichbar");
+            foreach (Hex g in GetComponent<Grid>().HexList)
+                if (g.GetEntdeckt())
+                    entdeckt++;
+            UnityEngine.Debug.Log("Endeckte Felder " + entdeckt);
             AlgoList.Clear(); //Liste leeren
-            Start = Ende = null; // Start und Ende nullen
+            Start = null; // Start und Ende nullen
             run = false; //Updatefunktion auf false setzen
             steps = 0;
         }
@@ -199,6 +213,7 @@ public class Tiefensuche : MonoBehaviour
         AddNeighborsToList();        //Nachbarn in Warteschlangeliste eintragen      
         StepList.Add(current);
         steps++;
+        Ende.IsEnde();
     }
 
     //Methode um im Stepmode ein Schritt zurück zu gehen
@@ -206,7 +221,7 @@ public class Tiefensuche : MonoBehaviour
     {
         current.ChangeColor(2);
         AlgoList.Add(current);
-        if(StepList[StepList.Count - 2] != null)
+        if (StepList[StepList.Count - 2] != null)
             current = StepList[StepList.Count - 2];
 
         if (StepList[StepList.Count - 1].getPrevious() == current || iNeighbors[iNeighbors.Count - 1] != 0)
@@ -215,12 +230,11 @@ public class Tiefensuche : MonoBehaviour
                 AlgoList[AlgoList.Count - 2].SetEntdeckt(false);
                 AlgoList[AlgoList.Count - 2].ResetColor();
                 AlgoList.RemoveAt(AlgoList.Count - 2);
-            }        
+            }
         iNeighbors.RemoveAt(iNeighbors.Count - 1);
         StepList.RemoveAt(StepList.Count - 1);
     }
 
-    
-}
 
+}
 

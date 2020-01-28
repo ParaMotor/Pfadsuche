@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,11 +17,10 @@ public class Breitensuche : MonoBehaviour
     public Hex Ende { get; set; }
     public Double ZeitfürStats { get; set; }
     public Boolean run = false;
+    public Transform character;
 
     //Werte für Einzelschritte
     public Boolean step = true;         //soll Steuern, ob der Stepmodus aktiviert werden soll
-    public Boolean nextStep = false;    //führt den nächsten Schritt im Stepmodus aus
-    public Boolean prevStep = false;    //geht ein Schritt zurück im Stepmode
     int thisNeighbors;                  //Zählt wie viele Nachbarn das Aktuelle Hex in die Algolist geschrieben hat
     List<List<Hex>> iNeighbors = new List<List<Hex>>();
     List<Hex> StepList = new List<Hex>();
@@ -33,6 +32,10 @@ public class Breitensuche : MonoBehaviour
     int setTimer;
     int counter;
     int steps = 0;
+
+    //
+    public List<Hex> pathList;
+    public int entdeckt;
 
     //Hauptprogramm
     public void Anfang()
@@ -75,7 +78,10 @@ public class Breitensuche : MonoBehaviour
         }
 
         if (Start != null && run && !step)
+        {
             SearchGrid();
+            steps++;
+        }
 
         //Abbruch des Algorithmus
         if (Start != null && !run)
@@ -93,7 +99,7 @@ public class Breitensuche : MonoBehaviour
                 {
                     wait = false;
                     SearchGrid();
-                    nextStep = false;
+                    steps++;
                 }
                 else if (Ende.GetEntdeckt() == true)
                     path = new CreatePath(Ende); //erstellen des Pfades
@@ -103,8 +109,10 @@ public class Breitensuche : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 if (current.getPrevious() != null)
+                {
                     PreviousStep();
-                prevStep = false;
+                    steps--;
+                }
             }
         }
 
@@ -142,13 +150,20 @@ public class Breitensuche : MonoBehaviour
         }
         else // Anschluss des Algortihmus
         {
-
             if (Ende.GetEntdeckt() == true)
+            {
                 path = new CreatePath(Ende); //erstellen des Pfades
+                pathList = path.path;
+                character.GetComponent<CharacterScript>().Init(pathList);
+            }
             else
                 UnityEngine.Debug.Log("Ende nicht erreichbar");
+            foreach (Hex g in GetComponent<Grid>().HexList)
+                if (g.GetEntdeckt())
+                    entdeckt++;
+            UnityEngine.Debug.Log("Endeckte Felder " + entdeckt);
             AlgoList.Clear(); //Liste leeren
-            Start = Ende = null; // Start und Ende nullen
+            Start = null; // Start und Ende nullen
             run = false; //Updatefunktion auf false setzen
             steps = 0;
         }
@@ -178,8 +193,8 @@ public class Breitensuche : MonoBehaviour
     {
         while (Ende.GetEntdeckt() == false && AlgoList.Count > 0)
         {
-            current = AlgoList[AlgoList.Count - 1]; //aktuelles Hex     aktualisieren
-            AlgoList.RemoveAt(AlgoList.Count - 1); //letztes Element aus liste holen
+            current = AlgoList[0]; //aktuelles Hex     aktualisieren
+            AlgoList.RemoveAt(0); //letztes Element aus liste holen
             AddNeighborsToList(); // Nachbarn in Liste einfügen
             steps++;
         }
@@ -195,6 +210,7 @@ public class Breitensuche : MonoBehaviour
         StepList.Add(current);
         steps++;
         iNeighbors.Clear();
+        Ende.IsEnde();
     }
 
     //Methode um im Stepmode ein Schritt zurück zu gehen
@@ -210,12 +226,12 @@ public class Breitensuche : MonoBehaviour
 
         //aktuelles Element eins zurück setzen
         current.ChangeColor(2);
-        current = StepList[StepList.Count - 2];        
+        current = StepList[StepList.Count - 2];
 
         //Algolist zurücksetzen
         temp = AlgoList;
-        AlgoList.Add(new Hex());        
-        for (int i = AlgoList.Count-1; i > 0; i--)
+        AlgoList.Add(new Hex());
+        for (int i = AlgoList.Count - 1; i > 0; i--)
         {
             AlgoList[i] = temp[i - 1];
         }
