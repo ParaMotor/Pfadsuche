@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Voreinstellungen : MonoBehaviour
 {
+//Variablen
+    public Grid grid;
+    public Hindernisse hindernisse;
+
     //für Gridgröße eintellen (also das Inputfield)
     private int groesse;
     bool istDezimal = true;
@@ -16,9 +17,7 @@ public class Voreinstellungen : MonoBehaviour
     //für InputField
     public string GridChange;
     public GameObject inputField;
-        
-    public Grid grid;
-    
+
     //Slider für Delay
     public Slider slider;
 
@@ -26,13 +25,19 @@ public class Voreinstellungen : MonoBehaviour
     public Hex Start;
     public Hex Ziel;
 
-    //"Inventar"
+    //Bei PlayButton
+    public int geseheneFelder = 0;
+    //public GameObject Character;
+    public Transform SpawnCharacter;
+    public GameObject charClone;
+    public Hex before;
     
 
+    
     public List<Hex> HexListObject;
-    //--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
 
-    //Methoden für das UI
+//Methoden für das UI
 
     //wechsel zum Hauptmenü
     public void BackMainMenu()
@@ -48,7 +53,7 @@ public class Voreinstellungen : MonoBehaviour
     {
         istDezimal = true;
         GridChange = inputField.GetComponent<Text>().text;   //holt String aus InputField und schreibt ihn auf die Variable
-        //überprüft ob alle eingegebenen Zeichen Zahlene sind, weil Unity z.B. "." zulässt
+        //überprüft ob alle eingegebenen Zeichen Zahlen sind, weil Unity z.B. "." zulässt
         foreach (char zeichen in GridChange)
         {
             if (!char.IsNumber(zeichen))
@@ -62,21 +67,34 @@ public class Voreinstellungen : MonoBehaviour
         if (istDezimal == true)
         {           
             groesse = int.Parse(GridChange);                    //groesse wird mit dem in Int gewandelten Wert von der Eingabe überschrieben
-            grid.Beginn(groesse);                               //die methode Beginn() vom Script Grid wird aufgerufen und der parameter wird übergeben
+            if(groesse > 25)
+            {
+                groesse = 25;
+                grid.Beginn(groesse);
+            }
+            else
+            {
+                grid.Beginn(groesse);                               //die methode Beginn() vom Script Grid wird aufgerufen und der parameter wird übergeben
+            }
+            
         }
 
     }
 
-    /*nach buttonclick wird das Start-Hex übergeben und auf eine Variable geschrieben damit es dem Algorithmus beim Starten übergeben werden kann*/
+    /*nach buttonclick wird das Start-Hex als "geclickt" gefärbt
+    * dann wird das geclickte Feld wird als "Start" markiert
+    * die Farbe des Feldes wird auf die "StartFarbe" gesetzt*/
     public void StartpunktButton()
     {
         if (Start != null)
             Start.ResetColor();
         Start = grid.GetClicked();
-        Start.IsStart();        
+        Start.IsStart();
     }
 
-    /*nach buttonclick wird das Ziel-Hex übergeben und auf eine Variable geschrieben damit es dem Algorithmus beim Starten übergeben werden kann*/
+    /*nach buttonclick wird das Ziel-Hex als "geclickt" gefärbt
+     * dann wird das geclickte Feld wird als "Ziel" markiert
+     * die Farbe des Feldes wird auf die "ZielFarbe" gesetzt*/
     public void ZielpunktButton()
     {
         if (Ziel != null)
@@ -110,10 +128,14 @@ public class Voreinstellungen : MonoBehaviour
     /*Die Nummer des Ausgewählte Algorithmus wird abgefragt damit der entsprechende Algorithmus, 
      * mit Start- und Ziel-Hex "geladen" werden kann.
      * Der Algorithmus wird dann ausgeführt.
-     * der Scenenwechsel erfolg durch Unity, mit dem ein-/ausblenden des jeweiligen Canvas, automatisch
+     * der "Scenenwechsel" erfolgt durch Unity, mit dem ein-/ausblenden des jeweiligen Canvas, automatisch
      */
     public void PlayButton()
     {
+        Astar3coords Astar = new Astar3coords();
+
+        hindernisse.SetChangeable(false); // deaktiviert Dragfunktion
+
         switch (auswahl)
         {
             case 0:
@@ -121,12 +143,13 @@ public class Voreinstellungen : MonoBehaviour
                 {
                     //sorgt dafür das wenn der Algorithmus läuft, die Farben der Hexagons nicht verändert werden können
                     foreach (Hex g in grid.HexList) { g.colorChangeOn = false; } 
-                    
+                   
                     Debug.Log("Tiefensuche wird ausgeführt");
                     grid.GetComponent<Tiefensuche>().enabled = true;
                     grid.GetComponent<Tiefensuche>().Start = Start;
                     grid.GetComponent<Tiefensuche>().Ende = Ziel;
                     grid.GetComponent<Tiefensuche>().Anfang();
+                    //CharakterSpwan();
                     break;
                 }
                 else
@@ -143,6 +166,7 @@ public class Voreinstellungen : MonoBehaviour
                     grid.GetComponent<Breitensuche>().Start = Start;
                     grid.GetComponent<Breitensuche>().Ende = Ziel;
                     grid.GetComponent<Breitensuche>().Anfang();
+                    //CharakterSpwan();
                     break;
                 }
                 else
@@ -152,21 +176,25 @@ public class Voreinstellungen : MonoBehaviour
                 }
             case 2:
                 Debug.Log("auswahl: A* ");
-                break;
-                /*if (Start != null && Ziel != null)
+                if (Start != null && Ziel != null)
                 {
-                    foreach (Hex g in grid.HexList) { g.colorChangeOn = false; }
-                    public class Astar3coords
-
-                    public void Astar(int maxX, int maxY, int objectX, int objectY, int objectZ, int startX, int startY, int startZ)
-                    break;
+                    Astar.Astar(Ziel, Start, grid);
                 }
                 else
                 {
                     Debug.Log("fehler bei Platzierung von Start- und Zielpunkt");
-                    break;
-                }*/
+                }
+                
+                break;
         }
+    }
+
+    
+
+    //ändert das Delay mit dem der algorithmus durch läuft
+    public void ChangeDelay()
+    {
+        grid.searchDelay = slider.value;
     }
 
     //Methode für den Zurückbutton in "InGameUI"
@@ -176,18 +204,11 @@ public class Voreinstellungen : MonoBehaviour
         foreach (Hex g in grid.HexList) { g.colorChangeOn = true; }
     }
 
-    public void ObjektSpawn()
-    {
-        //Instantiate(sampleObject, Vector3.up, Quaternion.identity);
-        //HexListObject.Add(sampleObject);
-    }
-    public void ChangeDelay()
-    {
-        grid.searchDelay = slider.value;
-    }
-
+    //ZurückButton wenn man "Ingame" ist, also nicht in den Einstellungen
     public void ZurueckButton()
     {
+        hindernisse.SetChangeable(true); // Aktieviert das Draggen wieder
+
         if (Start != null && Ziel != null)
         {
             Start.IsStart();
@@ -204,5 +225,26 @@ public class Voreinstellungen : MonoBehaviour
                 grid.GetComponent<Breitensuche>().enabled = false;
                 break;
         }
-    }   
+        //Destroy(charClone);
+    }
+    //Für charakter Erstellung und Bewegung
+    public void CharakterSpwan()
+    {
+        List<Hex> pfadRev = grid.GetComponent<Tiefensuche>().pathList;
+        Vector3 direction;
+        Hex before = pfadRev[pfadRev.Count - 1];
+        Instantiate(charClone, pfadRev[pfadRev.Count - 1].transform.position, SpawnCharacter.rotation);
+        pfadRev.RemoveAt(pfadRev.Count - 1);
+        for (int i = pfadRev.Count ; i > 0; i--)
+        {
+            direction = before.transform.position - pfadRev[pfadRev.Count - 1].transform.position;
+            for (int j = 4; j > 0; j--)
+            {
+                charClone.transform.position = charClone.transform.position + direction * 0.25f;
+            }
+            before = pfadRev[pfadRev.Count - 1];
+            pfadRev.RemoveAt(pfadRev.Count - 1);
+        }
+
+    }
 }

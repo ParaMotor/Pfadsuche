@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,7 +7,8 @@ public class Grid : MonoBehaviour
 {
     public Transform hexPrefab;
     public Transform WallPrefab;
-    public Transform camera;
+    public Transform oCamera;
+    public Transform pCamera;
 
     //Definition Gridgröße 
     public int gridWidth;
@@ -40,8 +41,9 @@ public class Grid : MonoBehaviour
         startPos = new Vector3(0, 0, 0);
         CreateGrid();
 
-        camera.position = HexList[HexList.Count - 1].getTransform().position / 2 + new Vector3(0, 1, 0);
-        camera.GetComponent<Camera>().orthographicSize = gridHeight;
+        oCamera.localPosition = HexList[HexList.Count - 1].getTransform().localPosition / 2 + new Vector3(0, 1, 0); //position für die orthographische Kamera bestimmen
+        oCamera.GetComponent<Camera>().orthographicSize = gridHeight;
+        pCamera.localPosition = HexList[HexList.Count - 1].getTransform().position / 2; // position für die perspektivische Kamera bestimmen
     }
 
     //berechent Startposition
