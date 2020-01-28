@@ -27,12 +27,15 @@ public class Voreinstellungen : MonoBehaviour
 
     //Bei PlayButton
     public int geseheneFelder = 0;
+
     //public GameObject Character;
     public Transform SpawnCharacter;
     public GameObject charClone;
     public Hex before;
-    
 
+    //Character Spawnen
+    public Transform character;
+    Transform charHelp;
     
     public List<Hex> HexListObject;
 //--------------------------------------------------------------------------------
@@ -90,6 +93,10 @@ public class Voreinstellungen : MonoBehaviour
             Start.ResetColor();
         Start = grid.GetClicked();
         Start.IsStart();
+        if (charHelp != null)
+            Destroy(charHelp.gameObject);
+        charHelp = Instantiate(character);
+        charHelp.position = Start.getTransform().position;
     }
 
     /*nach buttonclick wird das Ziel-Hex als "geclickt" gefärbt
@@ -148,6 +155,7 @@ public class Voreinstellungen : MonoBehaviour
                     grid.GetComponent<Tiefensuche>().enabled = true;
                     grid.GetComponent<Tiefensuche>().Start = Start;
                     grid.GetComponent<Tiefensuche>().Ende = Ziel;
+                    grid.GetComponent<Tiefensuche>().character = charHelp;
                     grid.GetComponent<Tiefensuche>().Anfang();
                     //CharakterSpwan();
                     break;
@@ -165,6 +173,7 @@ public class Voreinstellungen : MonoBehaviour
                     grid.GetComponent<Breitensuche>().enabled = true;
                     grid.GetComponent<Breitensuche>().Start = Start;
                     grid.GetComponent<Breitensuche>().Ende = Ziel;
+                    grid.GetComponent<Breitensuche>().character = charHelp;
                     grid.GetComponent<Breitensuche>().Anfang();
                     //CharakterSpwan();
                     break;
@@ -208,7 +217,9 @@ public class Voreinstellungen : MonoBehaviour
     public void ZurueckButton()
     {
         hindernisse.SetChangeable(true); // Aktieviert das Draggen wieder
-
+        charHelp.GetComponent<CharacterScript>().abort = true;
+        charHelp.transform.position = Start.getTransform().position;
+    
         if (Start != null && Ziel != null)
         {
             Start.IsStart();
