@@ -291,6 +291,6 @@ public class Grid : MonoBehaviour
         wall.position = new Vector3(x, y, z);                               //Wall an Stelle xl, hexPos.y, zo platzieren
         wall.Rotate(Rotation, Space.Self);                                  //Rotation um eigene Achse, nach Vektor
         wall.name = "Wall " + i + "." + position;                           //Bennenung Wand Oben links mit i.1 und weiter im Uhrzeigersinn
-        WallList.Add(wall);
+        WallList.Add(wall);                                                 //Wans in die Liste einfügen, damit sie adressierbar sind, dient dem zerstören
     }
 }
