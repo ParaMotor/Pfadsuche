@@ -172,100 +172,78 @@ public class Grid : MonoBehaviour
             // Oberste Reihe von links nach rechts ohne erstes und letztes Element
             if (HexList[i].yCoordinate == 0 && HexList[i].xCoordinate > 0)
             {
-                //Wand oben links 
-                Transform wall = Instantiate(WallPrefab) as Transform;      //WallPrefab als Objekt erstellen                           
-                WallInit(wall, xl, hexPos.y, zo, rotaLiOb);
-                wall.name = "Wall " + i + ".1";                            //Bennenung Wand Oben links mit i.1 und weiter im Uhrzeigersinn
+                //Wand oben links                 
+                WallInit(xl, hexPos.y, zo, rotaLiOb, i, 1);
 
                 //Wand oben rechts
-                Transform wall1 = Instantiate(WallPrefab) as Transform;
-                WallInit(wall1, xr, hexPos.y, zo, rotaReOb);
-                wall1.name = "Wall " + i + ".2";
+                WallInit(xr, hexPos.y, zo, rotaReOb, i, 2);
             }
             //Für Hex 0/0/0 oben rechts
             if (HexList[i].yCoordinate == 0 && HexList[i].xCoordinate == 0)
             {
                 //Wand oben rechts
-                Transform wall1 = Instantiate(WallPrefab) as Transform;
-                WallInit(wall1, xr, hexPos.y, zo, rotaReOb);
-                wall1.name = "Wall " + i + ".2";
+                WallInit(xr, hexPos.y, zo, rotaReOb, i, 2);
             }
             //Linke Seite, gerades Y 
             if (HexList[i].xCoordinate == xStart && HexList[i].yCoordinate % 2 == 0)
             {
                 //Wand oben links
-                Transform wall = Instantiate(WallPrefab) as Transform;
-                WallInit(wall, xl + addx, hexPos.y, zo, rotaLiOb);
-                wall.name = "Wall " + i + ".1";
+                WallInit((xl + addx), hexPos.y, zo, rotaLiOb, i, 1);
 
                 //Wand links
-                Transform wall1 = Instantiate(WallPrefab) as Transform;
-                WallInit(wall1, hexPos.x - 0.865f + addx, hexPos.y, hexPos.z, rotaLi);
-                wall1.name = "Wall " + i + ".6";
+                WallInit((hexPos.x - 0.865f + addx), hexPos.y, hexPos.z, rotaLi, i, 6);
 
                 //Wand unten links
-                Transform wall2 = Instantiate(WallPrefab) as Transform;
-                WallInit(wall2, xl + addx, hexPos.y, zu, rotaLiUn);
-                wall2.name = "Wall " + i + ".5";
+                WallInit((xl + addx), hexPos.y, zu, rotaLiUn, i, 5);
             }
             //Linke Seite, ungerades Y
             if (HexList[i].xCoordinate == xStart && HexList[i].yCoordinate % 2 == 1)
             {
                 //Wand links
-                Transform wall = Instantiate(WallPrefab) as Transform;
-                WallInit(wall, hexPos.x - 0.865f + addx, hexPos.y, hexPos.z, rotaLi);
-                wall.name = "Wall " + i + ".6";
+                WallInit((hexPos.x - 0.865f + addx), hexPos.y, hexPos.z, rotaLi, i, 6);
             }
 
             //Rechte Seite, gerades Y 
             if (HexList[i].xCoordinate == Width && HexList[i].yCoordinate % 2 == 0)
             {
                 //Wand rechts
-                Transform wall = Instantiate(WallPrefab) as Transform;
-                WallInit(wall, hexPos.x + 0.865f + addx, hexPos.y, hexPos.z, rotaRe);
-                wall.name = "Wall " + i + ".3";
+                WallInit((hexPos.x + 0.865f + addx), hexPos.y, hexPos.z, rotaRe, i, 3);
             }
             //Rechts Seite, ungerades Y
             if (HexList[i].xCoordinate == Width && HexList[i].yCoordinate % 2 == 1)
             {
                 //Wand rechts
-                Transform wall = Instantiate(WallPrefab) as Transform;
-                WallInit(wall, hexPos.x + 0.865f + addx, hexPos.y, hexPos.z, rotaRe);
-                wall.name = "Wall " + i + ".3";
+                WallInit((hexPos.x + 0.865f + addx), hexPos.y, hexPos.z, rotaRe, i, 3);
 
-                //Wand oben rechts
-                Transform wall1 = Instantiate(WallPrefab) as Transform;
-                WallInit(wall1, xr + addx, hexPos.y, zo, rotaReOb);
-                wall1.name = "Wall " + i + ".2";
+                //Wand oben rechts                
+                WallInit((xr + addx), hexPos.y, zo, rotaReOb, i, 2);
 
                 //Wand unten rechts
-                Transform wall2 = Instantiate(WallPrefab) as Transform;
-                WallInit(wall2, xr + addx, hexPos.y, zu, rotaReUn);
-                wall2.name = "Wall " + i + ".4";
+                WallInit((xr + addx), hexPos.y, zu, rotaReUn, i, 4);
             }
-            
+
             //Wände letzte Reihe
-            if (HexList[i].yCoordinate == (gridHeight-1) && HexList[i].xCoordinate < Width )
+            if (HexList[i].yCoordinate == (gridHeight - 1) && HexList[i].xCoordinate < Width)
             {
                 //Wand unten links 
-                Transform wall = Instantiate(WallPrefab) as Transform;    
-                WallInit(wall, xl + addx, hexPos.y, zu, rotaLiUn);
-                wall.name = "Wall " + i + ".5";                           
-
-                //Wand unten rechts
-                Transform wall1 = Instantiate(WallPrefab) as Transform;
-                WallInit(wall1, xr + addx, hexPos.y, zu, rotaReUn);
-                wall1.name = "Wall " + i + ".4";
+                WallInit((xl + addx), hexPos.y, zu, rotaLiUn, i ,5);
+                
+                //Wand unten rechts                
+                WallInit((xr + addx), hexPos.y, zu, rotaReUn, i, 4);
             }
             //Wand letztes Hex unten rechts
-            if (HexList[i].yCoordinate == (gridHeight-1) && HexList[i].xCoordinate == Width)
+            if (HexList[i].yCoordinate == (gridHeight - 1) && HexList[i].xCoordinate == Width)
             {
                 //Wand unten links 
-                Transform wall = Instantiate(WallPrefab) as Transform;
-                WallInit(wall, xl + addx, hexPos.y, zu, rotaLiUn);
-                wall.name = "Wall " + i + ".5";
-            } 
-            // print("i: " + i + " addx: " + addx);
+                WallInit((xl + addx), hexPos.y, zu, rotaLiUn, i, 5);                
+            }
+            //Wenn GridWidth ungerade, letztes Hex unten rechts
+            if (gridWidth % 2 == 1 && HexList[i].yCoordinate == Height && HexList[i].xCoordinate == Width)
+            {
+                //Wand unten rechts
+                WallInit((xr + addx), hexPos.y, zu, rotaReUn, i, 4);
+            }
+
         }
     }
 
@@ -283,7 +261,7 @@ public class Grid : MonoBehaviour
     {
         foreach (Hex g in HexList)
         {
-            Debug.Log("Entferne Hex: " + g.xCoordinate + ", " + g.yCoordinate);
+            //Debug.Log("Entferne Hex: " + g.xCoordinate + ", " + g.yCoordinate);
             g.Destroy();
         }
         foreach (Transform w in WallList)
@@ -307,10 +285,12 @@ public class Grid : MonoBehaviour
     }
 
     //Wand-funktion
-    void WallInit(Transform wall, float x, float y, float z, Vector3 Rotation)
+    void WallInit(float x, float y, float z, Vector3 Rotation, int i, int position)
     {
-        wall.position = new Vector3(x, y, z);       //Wall an Stelle xl, hexPos.y, zo platzieren
-        wall.Rotate(Rotation, Space.Self);          //Rotation um eigene Achse, nach Vektor
+        Transform wall = Instantiate(WallPrefab) as Transform;              //WallPrefab als Objekt erstellen
+        wall.position = new Vector3(x, y, z);                               //Wall an Stelle xl, hexPos.y, zo platzieren
+        wall.Rotate(Rotation, Space.Self);                                  //Rotation um eigene Achse, nach Vektor
+        wall.name = "Wall " + i + "." + position;                           //Bennenung Wand Oben links mit i.1 und weiter im Uhrzeigersinn
         WallList.Add(wall);
     }
 }
